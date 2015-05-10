@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" data-ng-app="myApp" class="no-js">
+<!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>My AngularJS App</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="bower_components/html5-boilerplate/css/normalize.css">
+<link rel="stylesheet"
+	href="bower_components/html5-boilerplate/css/main.css">
+<link rel="stylesheet"
+	href="bower_components/angular-bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="app.css">
+<script
+	src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+</head>
+<body>
+	<div ng-controller="menuCtrl" class="header navbar">
+		<div class="header-quick-nav">
+			<div class="pull-left">
+				<ul class="nav quick-section nav-left">
+					<li class="quick-link"><a href> <span
+							class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+					</a></li>
+					<li class="quick-link-2"><span class="header-padding"
+						aria-hidden="true"></span></li>
+					<li class="quick-link-2"><a href> <span
+							class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
+					</a></li>
+					<li class="quick-link-2"><span class="separator"></span></li>
+					<li class="quick-link-2"><a href ng-click="preSnapshot()"> <span
+							class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+					</a></li>
+					<li class="quick-link-2"><input ng-model="currentSnapshotId" type="text"
+						class="form-control page-input page-input-left"
+						aria-describedby="basic-addon2" value="{{currentSnapshotId}}"></li>
+					<li class="quick-link-2"><span
+						class="header-padding page-input-separator">/</span></li>
+					<li class="quick-link-2"><input type="text"
+						class="form-control page-input page-input-right"
+						aria-describedby="basic-addon2" value="{{latestSnapshotId}}" disabled></li>
+					<li class="quick-link-2"><a href ng-click="nextSnapshot()"> <span
+							class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+					</a></li>
+					<li class="quick-link-2"><span class="control-separator"></span>
+					</li>
+					<li class="quick-link-2"><a href ng-click="lastSnapshot()"> <span
+							class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+					</a></li>
+					<li class="quick-link-2"><span class="separator"></span></li>
+					<li class="quick-link-2"><a href> <span
+							class="glyphicon glyphicon-search" aria-hidden="true"></span>
+					</a></li>
+					<li class="quick-link-2"><input type="text"
+						class="form-control search-input" aria-describedby="basic-addon2"
+						placeholder="Search Products"></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="main-container">
+		<div class="sidebar">
+			<ul class="sidebar-menu">
+				<li class="start"><a href><span class="glyphicon glyphicon-home"
+						aria-hidden="true"></span> </a></li>
+				<li><a href><span class="glyphicon glyphicon-th-list"
+						aria-hidden="true"></span> </a></li>
+				<li><a href><span sidebar-play-btn class="glyphicon glyphicon-pause" ng-attr-play="on"
+						aria-hidden="true"></span> </a></li> <!-- glyphicon glyphicon-play --> 
+				<li><a href><span class="glyphicon glyphicon-filter"
+						aria-hidden="true"></span> </a></li>
+				<li><a href><span class="glyphicon glyphicon-music"
+						aria-hidden="true"></span> </a></li>
+				<li><a href><span sidebar-alert-btn class="glyphicon glyphicon-volume-up" ng-attr-alert="on"
+						aria-hidden="true"></span> </a></li><!-- glyphicon glyphicon-volume-off -->
+			</ul>
+		</div>
+		<div ng-view class="page-content"></div>
+	</div>
+
+	<script src="bower_components/angular/angular.js"></script>
+	<script src="bower_components/angular-route/angular-route.js"></script>
+	<script src="bower_components/angular-resource/angular-resource.js"></script>
+	<script src="app.js"></script>
+	<script src="snapshot/snapshot.js"></script>
+	<script src="menu/menu.js"></script>
+	<script src="sidebar/sidebar.js"></script>
+	<script src="components/version/version.js"></script>
+	<script src="components/version/version-directive.js"></script>
+	<script src="components/version/interpolate-filter.js"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+</body>
+</html>

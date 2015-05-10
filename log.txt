@@ -1,0 +1,59 @@
+22:39:30.001 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Start crawling with com.sales.af.crawler.AfCrawler
+22:39:30.485 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Working on top category mens, url http://www.abercrombie.com/shop/us/mens
+22:39:31.694 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sweaters gender: mens
+22:39:31.694 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: hoodies & sweatshirts gender: mens
+22:39:31.695 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: shirts gender: mens
+22:39:31.695 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: tees & henleys gender: mens
+22:39:31.695 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: polos gender: mens
+22:39:31.696 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: outerwear gender: mens
+22:39:31.696 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: jeans gender: mens
+22:39:31.696 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sweatpants gender: mens
+22:39:31.697 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: pants gender: mens
+22:39:31.697 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: shorts gender: mens
+22:39:31.697 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: accessories gender: mens
+22:39:31.698 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: cologne gender: mens
+22:39:32.159 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: featured items gender: mens
+22:39:32.160 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: hoodies & sweatshirts gender: mens
+22:39:32.160 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: shirts gender: mens
+22:39:32.160 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: tees & henleys gender: mens
+22:39:32.161 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sweaters gender: mens
+22:39:32.161 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: graphic tees gender: mens
+22:39:32.161 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: polos gender: mens
+22:39:32.161 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: tanks gender: mens
+22:39:32.162 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: outerwear gender: mens
+22:39:32.162 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: shorts gender: mens
+22:39:32.162 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: jeans gender: mens
+22:39:32.162 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sweatpants gender: mens
+22:39:32.163 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: pants gender: mens
+22:39:32.163 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: swim gender: mens
+22:39:32.163 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sleep gender: mens
+22:39:32.164 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: accessories gender: mens
+22:39:32.165 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: underwear gender: mens
+22:39:32.165 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Working on top category womens, url http://www.abercrombie.com/shop/us/womens
+22:39:32.612 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: outerwear gender: womens
+22:39:32.613 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: dresses & rompers gender: womens
+22:39:32.613 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: accessories gender: womens
+22:39:32.613 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sleep gender: womens
+22:39:32.614 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: fragrance gender: womens
+22:39:32.614 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: swim gender: womens
+22:39:32.614 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: footwear gender: womens
+22:39:33.042 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: featured items gender: womens
+22:39:33.042 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: outerwear gender: womens
+22:39:33.042 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: dresses & rompers gender: womens
+22:39:33.043 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sweaters gender: womens
+22:39:33.043 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: hoodies & sweatshirts gender: womens
+22:39:33.043 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: fashion tops gender: womens
+22:39:33.044 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: shirts gender: womens
+22:39:33.044 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: graphic tees gender: womens
+22:39:33.044 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: polos gender: womens
+22:39:33.045 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: a&f layering essentials gender: womens
+22:39:33.045 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: jeans gender: womens
+22:39:33.045 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sweatpants & leggings gender: womens
+22:39:33.046 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: pants gender: womens
+22:39:33.046 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: skirts gender: womens
+22:39:33.046 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: shorts gender: womens
+22:39:33.047 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: swim gender: womens
+22:39:33.047 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: footwear gender: womens
+22:39:33.047 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: accessories gender: womens
+22:39:33.048 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Work on category: sleep gender: womens
+22:39:33.048 [crawlerScheduler-2] INFO  com.sales.af.crawler.DataLoader - Done crawling with com.sales.af.crawler.AfCrawler

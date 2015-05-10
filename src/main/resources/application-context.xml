@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+							http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+							http://www.springframework.org/schema/context
+							http://www.springframework.org/schema/context/spring-context-3.2.xsd
+							http://www.springframework.org/schema/mvc
+							http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+							http://www.springframework.org/schema/tx
+							http://www.springframework.org/schema/tx/spring-tx.xsd
+							http://www.springframework.org/schema/jee
+							http://www.springframework.org/schema/jee/spring-jee-3.2.xsd 
+							http://www.springframework.org/schema/data/jpa 
+							http://www.springframework.org/schema/data/jpa/spring-jpa-1.0.xsd
+							http://www.springframework.org/schema/task
+							http://www.springframework.org/schema/task/spring-task-3.2.xsd">
+
+	<!-- Activates various annotations to be detected in bean classes -->
+	<context:annotation-config />
+	
+	<mvc:default-servlet-handler />
+
+	<context:property-placeholder
+		location="file:${catalina.home}/conf/af.properties" />
+
+	<mvc:annotation-driven />
+	<context:component-scan base-package="com.sales.af" />
+
+	<bean class="org.springframework.orm.hibernate4.HibernateExceptionTranslator" />
+
+	<bean id="tomcatDataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${DB_DRIVER}" />
+		<property name="url" value="${DB_URL}" />
+		<property name="username" value="${DB_USER}" />
+		<property name="password" value="${DB_PWD}" />
+		<property name="initialSize" value="5" />
+		<property name="maxActive" value="${MAX_CONNECTION}" />
+		<property name="maxIdle" value="${MAX_CONNECTION}" />
+		<property name="minIdle" value="2" />
+		<property name="testOnBorrow" value="true" />
+	</bean>
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceUnitName" value="entityManagerFactory" />
+		<property name="packagesToScan" value="com.sales.af.bo">
+		</property>
+		<!-- mappingResources for Named Queries -->
+		<property name="mappingResources">
+			<list>
+				<value>queries/AF.xml</value>
+			</list>
+		</property>
+
+		<property name="dataSource" ref="tomcatDataSource" />
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="false" />
+				<property name="databasePlatform" value="org.hibernate.dialect.PostgreSQLDialect"></property>
+
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager"
+		proxy-target-class="true" />
+
+	<bean id="jacksonObjectMapper" class="org.codehaus.jackson.map.ObjectMapper"></bean>
+
+	<bean id="afCrawler" class="com.sales.af.crawler.AfCrawler"></bean>
+	<bean id="dataLoader" class="com.sales.af.crawler.DataLoader"></bean>
+	<bean id="snapshotLoader" class="com.sales.af.crawler.SnapshotLoader"></bean>
+
+	<task:annotation-driven />
+	<task:scheduled-tasks>
+		<task:scheduled ref="afCrawler" method="crawl"
+			fixed-delay="90000" initial-delay="1000" />
+		<task:scheduled ref="dataLoader" method="load"
+			fixed-delay="5000" initial-delay="1000" />
+		<task:scheduled ref="snapshotLoader" method="load"
+			fixed-delay="2000" initial-delay="1000" />
+	</task:scheduled-tasks>
+
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+
+	<named-query name="getBrandByName">
+		<query><![CDATA[from Brand where name = :name]]></query>
+	</named-query>
+
+	<named-query name="getGenderByName">
+		<query><![CDATA[from Gender where name = :name]]></query>
+	</named-query>
+
+	<named-query name="getCategoryByName">
+		<query><![CDATA[from Category where name = :name]]></query>
+	</named-query>
+
+	<named-query name="getProductByProdIdAndBrand">
+		<query><![CDATA[from Product where productId in (:productIds) and brand = :brand]]></query>
+	</named-query>
+
+	<named-query name="getImages">
+		<query><![CDATA[from Image]]></query>
+	</named-query>
+	
+	<named-query name="getLatestSnapshotDetail">
+		<query><![CDATA[from Snapshot order by id desc]]></query>
+	</named-query>
+
+	<named-native-query name="getCurrentSnapshot">
+		<query><![CDATA[select 
+						*
+						from (
+							select
+							sd.*,
+							row_number() over (partition by sd.product_id order by sd.id desc) rank
+							from snapshot_detail sd
+							join products p on p.id = sd.product_id
+							where brand_id = :brandId
+						) t where rank = 1 and is_active = true]]></query>
+	</named-native-query>
+
+	<named-native-query name="getNextSnapshotId">
+		<query><![CDATA[select nextval('seq_snapshot_id')]]></query>
+	</named-native-query>
+
+	<named-native-query name="getMissingSnapshotId">
+		<query><![CDATA[select 
+						distinct sd.snapshot_id
+						from snapshot_detail sd
+						left join snapshots s on s.id = sd.snapshot_id
+						where s.id is null and sd.snapshot_id <= :sid]]></query>
+	</named-native-query>
+
+	<named-native-query name="getSnapshotBySid">
+		<query><![CDATA[with snapshot_detail_tmp as (
+							select sd.* from (
+								select
+								sd.*,
+								row_number() over (partition by product_id order by id desc) rank
+								from snapshot_detail sd
+								where snapshot_id <= :sid
+							) sd where sd.rank = 1 and sd.is_active = true
+						)
+						select
+						sd.id, p.id product_id, p.product_id product_data_id, p.create_date product_create_date,
+						p.brand_id, b.name brand, p.gender_id, g.name gender, p.category_id, c.name category,
+						sd.snapshot_id, sd.price_regular, sd.price_discount, round((sd.price_regular - sd.price_discount) / sd.price_regular, 2) discount, 
+						case when sd.snapshot_id = :sid then true else false end is_new,
+						sd.create_date sd_create_date, p.url prod_url, p.name prod_name, i.url img_url
+						from snapshot_detail_tmp sd
+						join products p on p.id = sd.product_id and p.is_active = true
+						join brands b on b.id = p.brand_id and b.is_active = true
+						join genders g on g.id = p.gender_id and g.is_active = true
+						join categories c on c.id = p.category_id and c.is_active = true
+						left join images i on i.product_id = p.id
+						order by sd.id desc]]></query>
+	</named-native-query>
+</entity-mappings>
