@@ -73,13 +73,13 @@
 				<li><a href><span class="glyphicon glyphicon-th-list"
 						aria-hidden="true"></span> </a></li>
 				<li><a href><span sidebar-play-btn class="glyphicon glyphicon-pause" ng-attr-play="on"
-						aria-hidden="true"></span> </a></li> <!-- glyphicon glyphicon-play --> 
-				<li><a href><span class="glyphicon glyphicon-filter"
+						aria-hidden="true"></span> </a></li>
+				<li><a href><span sidebar-filter-btn class="glyphicon glyphicon-filter"
 						aria-hidden="true"></span> </a></li>
 				<li><a href><span class="glyphicon glyphicon-music"
 						aria-hidden="true"></span> </a></li>
-				<li><a href><span sidebar-alert-btn class="glyphicon glyphicon-volume-up" ng-attr-alert="on"
-						aria-hidden="true"></span> </a></li><!-- glyphicon glyphicon-volume-off -->
+				<li><a href><span sidebar-alert-btn class="glyphicon glyphicon-volume-up" ng-attr-volume="on"
+						aria-hidden="true"></span> </a></li>
 			</ul>
 		</div>
 		<div ng-view class="page-content"></div>
@@ -88,6 +88,7 @@
 	<script src="bower_components/angular/angular.js"></script>
 	<script src="bower_components/angular-route/angular-route.js"></script>
 	<script src="bower_components/angular-resource/angular-resource.js"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 	<script src="app.js"></script>
 	<script src="snapshot/snapshot.js"></script>
 	<script src="menu/menu.js"></script>
@@ -95,6 +96,5 @@
 	<script src="components/version/version.js"></script>
 	<script src="components/version/version-directive.js"></script>
 	<script src="components/version/interpolate-filter.js"></script>
-	<script src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
 </body>
 </html>

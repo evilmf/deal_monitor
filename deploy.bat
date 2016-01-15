@@ -1,8 +1,8 @@
-rmdir /s /q G:\apache-tomcat-7.0.57\webapps\af\
-del g:\apache-tomcat-7.0.57\webapps\af.war
-del /F/ Q g:\apache-tomcat-7.0.57\logs\*
-del /F/ Q g:\apache-tomcat-7.0.57\conf\af.properties
+rmdir /s /q E:\apache-tomcat-7.0.57\webapps\af\
+del e:\apache-tomcat-7.0.57\webapps\af.war
+del /F/ Q e:\apache-tomcat-7.0.57\logs\*
+del /F/ Q e:\apache-tomcat-7.0.57\conf\af.properties
 
-copy G:\git\af\src\main\config\af.properties g:\apache-tomcat-7.0.57\conf\
-copy G:\git\af\target\af.war g:\apache-tomcat-7.0.57\webapps\
-g:\apache-tomcat-7.0.57\bin\startup.bat
+copy E:\git\af\src\main\config\af.properties e:\apache-tomcat-7.0.57\conf\
+copy E:\git\af\target\af.war e:\apache-tomcat-7.0.57\webapps\
+e:\apache-tomcat-7.0.57\bin\startup.bat

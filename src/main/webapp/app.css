@@ -172,7 +172,7 @@ body, html {
 }
 
 .snapshot-cnt {
-    padding: 10px;
+    padding: 10px 0 0 5px;
     /*border: 1px solid gray;*/
     height: 100%;
     width: 100%;
@@ -223,5 +223,18 @@ body, html {
     background-color: #DAF0DD;
 }
 
+.filter-modal-cnt .modal-dialog {
+	min-width: 600px;
+	min-height: 600px;
+}
+
+.filter-modal-cnt .modal-dialog .modal-content {
+	min-width: 600px;
+	min-height: 600px;
+}
+
+.filter-backdrop-fade {
+	height: 100%;
+}
 
 

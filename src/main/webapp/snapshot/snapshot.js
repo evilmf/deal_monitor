@@ -21,7 +21,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 	var getSnapshotById = function(id) {
 		inProgress = true;		
 		snapshotService.getSnapshotById(id).success(function(res) {
-			//$log.log('Setting snapshot!');
 			$scope.snapshotDetail = res['snapshotDetail'];
 		}).
 		error(function(res) {
@@ -35,7 +34,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 	
 	var initSnapshot = function() {
 		if(inProgress) {
-			$log.log('Skipping... Getting snapshot in progress.');
 			return;
 		}
 		
@@ -46,7 +44,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 			$scope.snapshotDetail = res['snapshotDetail'];
 		}).
 		error(function(res) {
-			$log.log('Error from initSnapshot');
 			$log.log(res);
 		}).
 		finally(function() {
@@ -56,7 +53,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 	
 	var getSnapshotNoDetail = function() {
 		if(inProgress) {
-			$log.log('Skipping... Getting snapshot in progress.');
 			return;
 		}
 		
@@ -72,7 +68,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 	};
 	
 	var getLatestSnapshot = function() {
-		//$log.log('Checking if there is new snapshot available.');
 		if(inProgress) {
 			$log.log('Skipping... Getting snapshot in progress.');
 			return;
@@ -102,20 +97,16 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 	var checkSnapshotUpdate = function() {
 		$interval(function() {
 			if(!$scope.updateOn) {
-				//$log.log('Update is off!');
 				return;
 			}
 			
 			if ($scope.latestSnapshotId == null) {
-				$log.log('Initializing snapshot.');
 				initSnapshot();
 			}
 			else if($scope.currentSnapshotId != $scope.latestSnapshotId) {
-				//$log.log('Getting snapshot with no detail.');
 				getSnapshotNoDetail();
 			}
 			else {
-				//$log.log('Getting latest snapshot.');
 				getLatestSnapshot();
 			}
 		}, 5000);
@@ -128,7 +119,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 	$scope.$watch(function() { return snapshotService.getUpdateStatus(); },
 			function(n, o) { 
 				if(n != null || n != o) {
-					//$log.log('updateOn ' + $scope.updateOn + ' ' + n);
 					$scope.updateOn = n; 
 				}
 			}
@@ -141,7 +131,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 				}
 				if(n != $scope.currentSnapshotId) {
 					$scope.currentSnapshotId = n; 
-					//$log.log("getCurrentSnapshot from watch");
 					getSnapshotById(n);
 				}
 			});
@@ -218,3 +207,13 @@ snapshotModule.factory('snapshotService', ['$http', '$log', function($http, $log
 			setUpdateStatus : setUpdateStatus,
 			setAlertStatus : setAlertStatus};
 }]);
+
+snapshotModule.filter('categorize', function($log){
+	return function(products) {
+		angular.forEach(products, function(product){
+			//$log.info(product['productName']);
+		});
+		
+		return products;
+	};
+});
