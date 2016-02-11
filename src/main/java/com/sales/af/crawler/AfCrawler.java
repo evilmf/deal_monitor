@@ -103,7 +103,7 @@ public class AfCrawler extends ProductQueue {
 								.format("http://anf.scene7.com/is/image/anf/anf_%s_01_prod1?$category-r-anf$",
 										dataCollectionId);
 						Elements prodPrice = p
-								.select("div.product-info>div.price span");
+								.select(".product-price-v2__inner>span");
 						if (prodPrice.size() < 2) {
 							continue;
 						}

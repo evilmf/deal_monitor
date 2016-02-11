@@ -13,6 +13,7 @@ body, html {
 	z-index 200;
 	background-color: #FFFFFF;
 	border-radius: 0;
+	margin-bottom: 0;
 }
 
 .navbar {
@@ -37,7 +38,6 @@ body, html {
 
 .page-content {
     padding-top: 60px;
-    background-color: #E5E9EC;
     width: 100%;
     height: 1500px;
     z-index: 10;
@@ -172,7 +172,7 @@ body, html {
 }
 
 .snapshot-cnt {
-    padding: 10px 0 0 5px;
+    padding: 0 0 0 5px;
     /*border: 1px solid gray;*/
     height: 100%;
     width: 100%;
@@ -224,17 +224,22 @@ body, html {
 }
 
 .filter-modal-cnt .modal-dialog {
-	min-width: 600px;
-	min-height: 600px;
+	min-width: 400px;
+	min-height: 400px;
 }
 
 .filter-modal-cnt .modal-dialog .modal-content {
-	min-width: 600px;
-	min-height: 600px;
+	min-width: 350px;
+	min-height: 350px;
+	padding: 20px;
 }
 
 .filter-backdrop-fade {
 	height: 100%;
+}
+
+#filterCheckbox {
+	padding-left: 10px;
 }
 
 

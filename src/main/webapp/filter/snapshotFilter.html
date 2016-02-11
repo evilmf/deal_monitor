@@ -1,0 +1,24 @@
+<div>
+	<div class="modal-header ng-scope">
+		<h3 class="modal-title">Filter</h3>
+    </div>
+    <div class="modal-body ng-scope">
+        <div class="form-group">
+	        <select class="form-control" ng-model="selectedOption"
+	        	ng-options="option.name for option in filterOptions track by option.name">
+	      	</select>
+	    	<div id="filterCheckbox">
+			    <div class="checkbox" ng-repeat="(categoryId, category) in selectedOption.value.category">
+					<label>
+				    	<input type="checkbox" ng-model="category.selected" ng-click=processCategoryFilter({brandId:selectedOption.value.brandId,genderId:selectedOption.value.genderId,categoryId:categoryId,selected:!category.selected})>
+				      	{{category.name}}
+				    </label>
+				</div>
+			</div>
+	  	</div>
+    </div>
+	<div class="modal-footer ng-scope">
+		<!--button class="btn btn-primary" type="button" ng-click="ok()">OK</button-->
+        <!--button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button-->
+    </div>
+</div>

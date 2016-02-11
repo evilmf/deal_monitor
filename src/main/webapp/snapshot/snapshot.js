@@ -9,19 +9,20 @@ snapshotModule.config(['$routeProvider', function($routeProvider) {
   });
 }]);
 
-snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', '$interval', function(snapshotService, $log, $scope, $interval) {
-	$scope.latestSnapshotId = null;
-	$scope.currentSnapshotId = null;
-	$scope.snapshotDetail = null;
-	$scope.updateOn = true;
-	$scope.alertOn = true;
+snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScope', '$interval', function(snapshotService, $log, $rootScope, $interval) {
+	$rootScope.latestSnapshotId = null;
+	$rootScope.currentSnapshotId = null;
+	$rootScope.snapshotDetail = null;
+	$rootScope.updateOn = true;
+	$rootScope.alertOn = true;
 	
 	var inProgress = false;
 	
 	var getSnapshotById = function(id) {
-		inProgress = true;		
+		inProgress = true;
 		snapshotService.getSnapshotById(id).success(function(res) {
-			$scope.snapshotDetail = res['snapshotDetail'];
+			$log.log('getSnapshotById - setting $scope.snapshotDetail');
+			$rootScope.snapshotDetail = res['snapshotDetail'];
 		}).
 		error(function(res) {
 			$log.log('Error from getSnapshotById');
@@ -39,9 +40,10 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 		
 		inProgress = true;
 		snapshotService.initSnapshot().success(function(res) {
-			snapshotService.setCurrentSnapshotId(res['snapshotId']);
-			snapshotService.setLatestSnapshotId(res['snapshotId']);
-			$scope.snapshotDetail = res['snapshotDetail'];
+			$log.log('initSnapshot - setting $scope.snapshotDetail');
+			$rootScope.currentSnapshotId = res['snapshotId'];
+			$rootScope.latestSnapshotId = res['snapshotId'];
+			$rootScope.snapshotDetail = res['snapshotDetail'];
 		}).
 		error(function(res) {
 			$log.log(res);
@@ -58,8 +60,8 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 		
 		inProgress = true;
 		snapshotService.getSnapshotNoDetail().success(function(res) {
-			if(res['snapshotId'] > $scope.latestSnapshotId) {
-				snapshotService.setLatestSnapshotId(res['snapshotId']);
+			if(res['snapshotId'] > $rootScope.latestSnapshotId) {
+				$rootScope.latestSnapshotId = res['snapshotId'];
 			}
 		}).
 		finally(function() {
@@ -74,15 +76,15 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 		}
 		
 		inProgress = true;
-		var sid = $scope.latestSnapshotId + 1;
+		var sid = $rootScope.latestSnapshotId + 1;
 		snapshotService.getSnapshotById(sid).success(function(res) {
 			if(res['snapshotDetail'] != null) {
+				$log.log('snapshotService.getLatestSnapshot');
 				$log.log('New snapshot available.');
-				$scope.snapshotDetail = res['snapshotDetail'];
-				$scope.latestSnapshotId = res['snapshotId'];
-				$scope.currentSnapshotId = res['snapshotId'];
-				snapshotService.setCurrentSnapshotId(res['snapshotId']);
-				snapshotService.setLatestSnapshotId(res['snapshotId']);
+				$log.log('initSnapshot - setting $scope.snapshotDetail');
+				$rootScope.snapshotDetail = res['snapshotDetail'];
+				$rootScope.latestSnapshotId = res['snapshotId'];
+				$rootScope.currentSnapshotId = res['snapshotId'];
 			}
 		}).
 		error(function(res) {
@@ -96,90 +98,37 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$scope', 
 	
 	var checkSnapshotUpdate = function() {
 		$interval(function() {
-			if(!$scope.updateOn) {
+			if(!$rootScope.updateOn) {
 				return;
 			}
 			
-			if ($scope.latestSnapshotId == null) {
+			if ($rootScope.latestSnapshotId == null) {
 				initSnapshot();
 			}
-			else if($scope.currentSnapshotId != $scope.latestSnapshotId) {
+			else if($rootScope.currentSnapshotId != $rootScope.latestSnapshotId) {
 				getSnapshotNoDetail();
 			}
 			else {
 				getLatestSnapshot();
 			}
-		}, 5000);
+		}, 5000, 0, false);
 	};
 	
 	initSnapshot();
 	
 	checkSnapshotUpdate();
 	
-	$scope.$watch(function() { return snapshotService.getUpdateStatus(); },
-			function(n, o) { 
-				if(n != null || n != o) {
-					$scope.updateOn = n; 
-				}
+	$rootScope.$watch(function() { 
+			return $rootScope.currentSnapshotId;
+		}, 
+		function(n, o) {
+			if(n != o) {
+				getSnapshotById(n);
 			}
-	);
-	
-	$scope.$watch(function() { return snapshotService.getCurrentSnapshotId(); },
-			function(n, o) { 
-				if(n == null) {
-					return;
-				}
-				if(n != $scope.currentSnapshotId) {
-					$scope.currentSnapshotId = n; 
-					getSnapshotById(n);
-				}
-			});
-	
-	$scope.$watch(function() { return snapshotService.getLatestSnapshotId(); },
-			function(n, o) { 
-				$scope.latestSnapshotId = n; 
-			}
-	);
+		}, true);
 }]);
 
 snapshotModule.factory('snapshotService', ['$http', '$log', function($http, $log){
-	var snapshotData = {latestSnapshotId : null,
-					currentSnapshotId : null,
-					updateStatus : null,
-					alsertStatus: null};
-	
-	var getLatestSnapshotId = function() {
-		return snapshotData.latestSnapshotId;
-	};
-	
-	var getCurrentSnapshotId = function() {
-		return snapshotData.currentSnapshotId;
-	};
-	
-	var getUpdateStatus = function() {
-		return snapshotData.updateStatus;
-	};
-	
-	var getAlertStatus = function() {
-		return snapshotData.alertStatus;
-	};
-	
-	var setLatestSnapshotId = function(latestSnapshotId) {
-		snapshotData.latestSnapshotId = latestSnapshotId;
-	};
-	
-	var setCurrentSnapshotId = function(currentSnapshotId) {
-		snapshotData.currentSnapshotId = currentSnapshotId;
-	};
-	
-	var setUpdateStatus = function(updateStatus) {
-		snapshotData.updateStatus = updateStatus;
-	};
-	
-	var setAlertStatus = function(alertStatus) {
-		snapshotData.alertStatus = alertStatus;
-	};
-	
 	var getSnapshotById = function(snapshotId) {
 		var url = '/af/getSnapshot/' + snapshotId;
 		return $http.get(url);
@@ -197,23 +146,75 @@ snapshotModule.factory('snapshotService', ['$http', '$log', function($http, $log
 	
 	return {getSnapshotById : getSnapshotById,
 			getSnapshotNoDetail : getSnapshotNoDetail,
-			initSnapshot : initSnapshot,
-			getLatestSnapshotId : getLatestSnapshotId,
-			getCurrentSnapshotId : getCurrentSnapshotId,
-			getUpdateStatus : getUpdateStatus,
-			getAlertStatus : getAlertStatus,
-			setLatestSnapshotId : setLatestSnapshotId,
-			setCurrentSnapshotId : setCurrentSnapshotId,
-			setUpdateStatus : setUpdateStatus,
-			setAlertStatus : setAlertStatus};
+			initSnapshot : initSnapshot};
 }]);
 
-snapshotModule.filter('categorize', function($log){
-	return function(products) {
-		angular.forEach(products, function(product){
-			//$log.info(product['productName']);
+snapshotModule.filter('categorize', ['$log', 'snapshotFilterService', function($log, snapshotFilterService){
+	return function(products, filteredCategory) {
+		$log.log('categorize' + ' ' + (new Date));
+		var filteredProducts = {};
+		
+		if(filteredCategory == undefined) {
+			filteredCategory = snapshotFilterService.loadCategoryFromCookies();
+		}
+		
+		angular.forEach(products, function(product, productId) {
+			try {
+				if(filteredCategory[product.brandId][product.genderId][product.categoryId]) {
+					filteredProducts[productId] = product;
+				}
+			}
+			catch (error) {
+				filteredProducts[productId] = product;
+			}
 		});
 		
-		return products;
+		return filteredProducts;
 	};
-});
+}]);
+
+snapshotModule.filter('order', ['$log', function($log) {
+	return function(products) {
+		$log.log('order');
+		var orderedProducts = [];
+		
+		angular.forEach(products, function(product, productId) {
+			orderedProducts.push(product);
+		});
+		
+		if(orderedProducts.length > 1) {
+			orderedProducts.sort(function(a, b) {
+				return a.priceDiscount - b.priceDiscount;
+			});
+		}
+		
+		return orderedProducts;
+	};
+}]);
+
+/*
+ * Object {productId: 8139, 
+ * images: Array[1], 
+ * priceRegular: 20, 
+ * priceDiscount: 14, 
+ * productUrl: "http://www.abercrombie.com/shop/us/mens-graphic-tees-clearance/do-right-graphic-tee-6197574?ofp=true"…}
+ * brandId: 1
+ * brandName: "abercrombie & fitch"
+ * categoryId: 6
+ * categoryName: "graphic tees"
+ * discount: 0.3
+ * genderId: 2
+ * genderName: "mens"
+ * images: Array[1]
+ * isNew: false
+ * priceDiscount: 14
+ * priceRegular: 20
+ * productCreateDate: 1453161600000
+ * productDataId: "6197574"
+ * productId: 8139
+ * productName: "Do Right Graphic Tee"
+ * productUrl: "http://www.abercrombie.com/shop/us/mens-graphic-tees-clearance/do-right-graphic-tee-6197574?ofp=true"
+ * snapshotCreateDate: 1453161600000
+ * snapshotDetailId: 42662
+ * snapshotId: 2243__proto__: Object
+ */

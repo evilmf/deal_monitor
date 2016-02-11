@@ -2,34 +2,24 @@
 
 var menuModule = angular.module('myApp.menu', []);
 
-menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$scope', function(snapshotService, menuService, $log, $scope) {
-	$scope.latestSnapshotId = null;
-	$scope.currentSnapshotId = null;
-	$scope.snapshotDetail = null;
-	
-	$scope.nextSnapshot = function() {
-		snapshotService.setCurrentSnapshotId(menuService.getNextSnapshotId($scope.currentSnapshotId, $scope.latestSnapshotId));
+menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$rootScope', function(snapshotService, menuService, $log, $rootScope) {
+	$rootScope.nextSnapshot = function() {
+		$rootScope.currentSnapshotId = menuService.getNextSnapshotId($rootScope.currentSnapshotId, $rootScope.latestSnapshotId);
 	};
 	
-	$scope.preSnapshot = function() {
-		snapshotService.setCurrentSnapshotId(menuService.getPreSnapshotId($scope.currentSnapshotId));
+	$rootScope.preSnapshot = function() {
+		$rootScope.currentSnapshotId = menuService.getPreSnapshotId($rootScope.currentSnapshotId);
 	};
 	
-	$scope.lastSnapshot = function() {
-		snapshotService.setCurrentSnapshotId($scope.latestSnapshotId);
+	$rootScope.lastSnapshot = function() {
+		$rootScope.currentSnapshotId = $rootScope.latestSnapshotId;
 	};
 	
-	$scope.$watch(function() { return snapshotService.getCurrentSnapshotId(); }, function(n, o) {
-		if(n != o) {
-			$scope.currentSnapshotId = n;
+	$rootScope.getSnapshotById = function(id) {
+		if(id > 0) {
+			$rootScope.currentSnapshotId = id;
 		}
-	});
-	
-	$scope.$watch(function() { return snapshotService.getLatestSnapshotId(); }, function(n, o) {
-		if(n != o) {
-			$scope.latestSnapshotId = n;
-		}
-	});
+	};
 }]);
 
 menuModule.factory('menuService', ['$log', function($log){

@@ -21,7 +21,8 @@ public class GenderDaoImpl implements GenderDao {
 
 	@Autowired
 	UtilDao utilDao;
-
+	
+	@Override
 	public Gender getGenderByName(String genderName) {
 		Query query = entityManager.createNamedQuery("getGenderByName",
 				Gender.class);
@@ -36,8 +37,18 @@ public class GenderDaoImpl implements GenderDao {
 			return genders.get(0);
 		}
 	}
-
+	
+	@Override
 	public Gender insertGender(Gender gender) {
 		return utilDao.saveOrUpdate(gender);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Gender> getGenders() {
+		Query query = entityManager.createNamedQuery("getGenders",
+				Gender.class);
+		
+		return query.getResultList();
 	}
 }

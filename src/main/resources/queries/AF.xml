@@ -23,6 +23,18 @@
 		<query><![CDATA[from Image]]></query>
 	</named-query>
 	
+	<named-query name="getBrands">
+		<query><![CDATA[from Brand]]></query>
+	</named-query>
+	
+	<named-query name="getGenders">
+		<query><![CDATA[from Gender]]></query>
+	</named-query>
+	
+	<named-query name="getCategories">
+		<query><![CDATA[from Category]]></query>
+	</named-query>
+	
 	<named-query name="getLatestSnapshotDetail">
 		<query><![CDATA[from Snapshot order by id desc]]></query>
 	</named-query>

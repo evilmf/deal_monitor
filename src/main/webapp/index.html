@@ -8,7 +8,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>My AngularJS App</title>
+<title>Deal Monitor</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet"
@@ -38,9 +38,12 @@
 					<li class="quick-link-2"><a href ng-click="preSnapshot()"> <span
 							class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
 					</a></li>
-					<li class="quick-link-2"><input ng-model="currentSnapshotId" type="text"
+					<li class="quick-link-2"><input 
+						ng-model="$root.currentSnapshotId" 
+						type="text"
 						class="form-control page-input page-input-left"
-						aria-describedby="basic-addon2" value="{{currentSnapshotId}}"></li>
+						aria-describedby="basic-addon2"
+						ng-change="getSnapshotById(currentSnapshotId)"></li>
 					<li class="quick-link-2"><span
 						class="header-padding page-input-separator">/</span></li>
 					<li class="quick-link-2"><input type="text"
@@ -79,19 +82,21 @@
 				<li><a href><span class="glyphicon glyphicon-music"
 						aria-hidden="true"></span> </a></li>
 				<li><a href><span sidebar-alert-btn class="glyphicon glyphicon-volume-up" ng-attr-volume="on"
-						aria-hidden="true"></span> </a></li>
+						aria-hidden="true"></span> </a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li>
 			</ul>
 		</div>
 		<div ng-view class="page-content"></div>
 	</div>
 
 	<script src="bower_components/angular/angular.js"></script>
+	<script src="bower_components/angular-cookies/angular-cookies.js"></script>
 	<script src="bower_components/angular-route/angular-route.js"></script>
 	<script src="bower_components/angular-resource/angular-resource.js"></script>
 	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 	<script src="app.js"></script>
 	<script src="snapshot/snapshot.js"></script>
 	<script src="menu/menu.js"></script>
+	<script src="filter/filter.js"></script>
 	<script src="sidebar/sidebar.js"></script>
 	<script src="components/version/version.js"></script>
 	<script src="components/version/version-directive.js"></script>

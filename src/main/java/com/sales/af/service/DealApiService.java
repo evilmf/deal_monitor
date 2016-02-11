@@ -1,5 +1,6 @@
 package com.sales.af.service;
 
+import com.sales.af.to.ClassificationTo;
 import com.sales.af.to.SnapshotTo;
 
 public interface DealApiService {
@@ -8,4 +9,6 @@ public interface DealApiService {
     public SnapshotTo getLatestSnapshotDetail();
 
     public SnapshotTo getSnapshotNoDetail();
+    
+    public ClassificationTo getClassification();
 }

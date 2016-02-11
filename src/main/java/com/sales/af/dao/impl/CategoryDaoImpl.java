@@ -20,7 +20,8 @@ public class CategoryDaoImpl implements CategoryDao {
 
 	@Autowired
 	UtilDao utilDao;
-
+	
+	@Override
 	public Category getCategoryByName(String categoryName) {
 		Query query = entityManager.createNamedQuery("getCategoryByName",
 				Category.class);
@@ -35,8 +36,18 @@ public class CategoryDaoImpl implements CategoryDao {
 			return categories.get(0);
 		}
 	}
-
+	
+	@Override
 	public Category insertCategory(Category category) {
 		return utilDao.saveOrUpdate(category);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Category> getCategories() {
+		Query query = entityManager.createNamedQuery("getCategories",
+				Category.class);
+		
+		return query.getResultList();
 	}
 }

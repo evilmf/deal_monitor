@@ -1,6 +1,6 @@
 <div class="snapshot-cnt">
-	<div class="prod-cnt pull-left" ng-repeat="product in snapshotDetail | categorize">
-		<div><a href><img class="prod-img" ng-src="{{product['images'][0]}}" /></a></div>
+	<div class="prod-cnt pull-left" ng-repeat="product in snapshotDetail | categorize:filteredCategory | order">
+		<div><a target="_blank" ng-href="{{product.productUrl}}"><img class="prod-img" ng-src="{{product['images'][0]}}" /></a></div>
 		<div class="prod-name"><a href>{{product['productName']}}</a></div>
 		<div class="prod-price"><a href>{{product['priceDiscount']}} - {{product['priceRegular']}}</a></div>
 		<div class="prod-cat"><a href>{{product['categoryName']}}</a></div>

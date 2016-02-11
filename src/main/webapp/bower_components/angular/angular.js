@@ -8447,7 +8447,8 @@ function $HttpProvider() {
         }
 
         resolvePromise(response, status, headersString, statusText);
-        if (!$rootScope.$$phase) $rootScope.$apply();
+        if (!$rootScope.$$phase) 
+        	$rootScope.$apply();
       }
 
 
@@ -9116,7 +9117,8 @@ function $IntervalProvider() {
           delete intervals[promise.$$intervalId];
         }
 
-        if (!skipApply) $rootScope.$apply();
+        if (!skipApply) 
+        	$rootScope.$apply();
 
       }, delay);
 
@@ -9939,7 +9941,8 @@ function $LocationProvider(){
             afterLocationChange(oldUrl);
           }
         });
-        if (!$rootScope.$$phase) $rootScope.$digest();
+        if (!$rootScope.$$phase) 
+        	$rootScope.$digest();
       }
     });
 
@@ -14423,7 +14426,8 @@ function $TimeoutProvider() {
           delete deferreds[promise.$$timeoutId];
         }
 
-        if (!skipApply) $rootScope.$apply();
+        if (!skipApply) 
+        	$rootScope.$apply();
       }, delay);
 
       promise.$$timeoutId = timeoutId;

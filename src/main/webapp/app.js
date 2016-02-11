@@ -6,6 +6,7 @@ angular.module('myApp', [
   'myApp.snapshot',
   'myApp.menu',
   'myApp.sidebar',
+  'myApp.filter',
   'myApp.version'
 ]).
 config(['$routeProvider', function($routeProvider) {

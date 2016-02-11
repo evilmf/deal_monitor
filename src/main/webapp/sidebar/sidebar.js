@@ -1,19 +1,24 @@
 'use strict';
 
-var sidebarModule = angular.module('myApp.sidebar', ['ui.bootstrap']);
+var sidebarModule = angular.module('myApp.sidebar', ['ui.bootstrap', 'ngCookies']);
 
 sidebarModule.controller('sidebarCtrl', ['$log', function($log) {
 	
 }]);
 
-sidebarModule.directive('sidebarFilterBtn', ['$log', 'snapshotService', '$modal', function($log, snapshotService, $modal) {
+sidebarModule.controller('filterModalCtrl', ['$log', 'snapshotService', function($log, snapshotService) {
+	
+}]);
+
+sidebarModule.directive('sidebarFilterBtn', ['$log', '$modal', function($log, $modal) {
 	var link = function(scope, element, attr) {
 		element.on('click', function(event) {
 			$modal.open({
 				templateUrl : 'filter/snapshotFilter.html',
 				windowClass : 'filter-modal-cnt',
 				backdrop : true,
-				backdropClass : 'filter-backdrop-fade'
+				backdropClass : 'filter-backdrop-fade',
+				controller: 'snapshotFilterCtrl'
 			});
 		});
 	};
@@ -21,24 +26,24 @@ sidebarModule.directive('sidebarFilterBtn', ['$log', 'snapshotService', '$modal'
 	return {link : link};
 }]);
 
-sidebarModule.directive('sidebarAlertBtn', ['$log', 'snapshotService', function($log, snapshotService) {
+sidebarModule.directive('sidebarAlertBtn', ['$log', '$rootScope', function($log, $rootScope) {
 	var link = function(scope, element, attr) {
 		var on = 'on';
 		var off = 'off';
 		
 		element.on('click', function(event) {
-			if(element.attr('sounc') == on) {
+			if(element.attr('sound') == on) {
 				element.attr('sound', off);
 				element.removeClass('glyphicon-volume-up');
 				element.addClass('glyphicon-volume-off');
-				snapshotService.setAlertStatus(false);
+				$rootScope.alertOn = false;
 				$log.log('[alert] ' + element.attr('sound'));
 			}
 			else {
 				element.attr('sound', on);
 				element.removeClass('glyphicon-volume-off');
 				element.addClass('glyphicon-volume-up');
-				snapshotService.setAlertStatus(true);
+				$rootScope.alertOn = true;
 				$log.log('[alert] ' + element.attr('sound'));
 			}
 		});
@@ -47,7 +52,7 @@ sidebarModule.directive('sidebarAlertBtn', ['$log', 'snapshotService', function(
 	return {link : link};
 }]);
 
-sidebarModule.directive('sidebarPlayBtn', ['$log', 'snapshotService', function($log, snapshotService) {
+sidebarModule.directive('sidebarPlayBtn', ['$log', '$rootScope', function($log, $rootScope) {
 	var link = function(scope, element, attr) {
 		var on = 'on';
 		var off = 'off';
@@ -57,16 +62,27 @@ sidebarModule.directive('sidebarPlayBtn', ['$log', 'snapshotService', function($
 				element.attr('play', off);
 				element.removeClass('glyphicon-pause');
 				element.addClass('glyphicon-play');
-				snapshotService.setUpdateStatus(false);
+				$rootScope.updateOn = false;
 			}
 			else {
 				element.attr('play', on);
 				element.removeClass('glyphicon-play');
 				element.addClass('glyphicon-pause');
-				snapshotService.setUpdateStatus(true);
+				$rootScope.updateOn = true;
 			}
 		});
 	};
 	
 	return {link : link};
+}]);
+
+sidebarModule.directive('audioAlert', ['$rootScope', '$log', function($rootScope, $log) {
+	return {
+		restrict: 'A',
+		link: function(scope, element, attrs) {
+	        $rootScope.$watch('latestSnapshotId', function(o, n) {
+	        	element[0].play();
+	        }, true);
+	    }
+	};
 }]);
