@@ -6,8 +6,7 @@ angular.module('myApp', [
   'myApp.snapshot',
   'myApp.menu',
   'myApp.sidebar',
-  'myApp.filter',
-  'myApp.version'
+  'myApp.filter'
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.otherwise({redirectTo: '/snapshot'});
