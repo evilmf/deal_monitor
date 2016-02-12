@@ -28,6 +28,10 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 		var categoryFilter = loadCategoryFromCookies();
 		
 		angular.forEach(products, function(product) {
+			if(categoryFilter == null) {
+				categoryFilter = {};
+			}
+			
 			if(categoryFilter[product['brandId']] == undefined) {
 				categoryFilter[product['brandId']] = {};
 			}
@@ -58,11 +62,41 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 		return category;
 	};
 	
+	var setDefaultCategory = function(products) {
+		var categoryFilter = loadCategoryFromCookies();
+		var defaultCategory = /outerwear|jacket/i;
+		
+		angular.forEach(products, function(product) {
+			if(categoryFilter == null) {
+				categoryFilter = {};
+			}
+			
+			if(categoryFilter[product['brandId']] == undefined) {
+				categoryFilter[product['brandId']] = {};
+			}
+			
+			if(categoryFilter[product['brandId']][product['genderId']] == undefined) {
+				categoryFilter[product['brandId']][product['genderId']] = {};
+			}
+			
+			categoryFilter[product['brandId']][product['genderId']][product['categoryId']] = 
+				product['categoryName'].search(defaultCategory) != -1 ? true : false;
+		});
+		
+		setCookiesForCategory(categoryFilter);
+			
+		return categoryFilter;
+	};
+	
 	var loadCategoryFromCookies = function() {
-		var brands = {};
+		var brands = null;
 		
 		angular.forEach($cookies, function(c, i) {
 			try {
+				if(brands == null) {
+					brands = {};
+				}
+				
 				var categories = JSON.parse(c);
 				var brand = i;
 				
@@ -155,5 +189,6 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 			mapCategories : mapCategories,
 			buildOptions : buildOptions,
 			processCategoryFilter : processCategoryFilter,
-			loadCategoryFromCookies : loadCategoryFromCookies};
+			loadCategoryFromCookies : loadCategoryFromCookies,
+			setDefaultCategory : setDefaultCategory};
 }]);

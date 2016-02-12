@@ -11,22 +11,16 @@
 <title>Deal Monitor</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--link rel="stylesheet"
-	href="bower_components/html5-boilerplate/css/normalize.css">
-<link rel="stylesheet"
-	href="bower_components/html5-boilerplate/css/main.css"-->
 <link rel="stylesheet"
 	href="bower_components/angular-bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="app.css">
-<!--script
-	src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script-->
 </head>
 <body>
 	<div ng-controller="menuCtrl" class="header navbar">
 		<div class="header-quick-nav">
 			<div class="pull-left">
 				<ul class="nav quick-section nav-left">
-					<li class="quick-link"><a href> <span
+					<!--li class="quick-link"><a href> <span
 							class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
 					</a></li>
 					<li class="quick-link-2"><span class="header-padding"
@@ -34,7 +28,7 @@
 					<li class="quick-link-2"><a href> <span
 							class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
 					</a></li>
-					<li class="quick-link-2"><span class="separator"></span></li>
+					<li class="quick-link-2"><span class="separator"></span></li-->
 					<li class="quick-link-2"><a href ng-click="preSnapshot()"> <span
 							class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
 					</a></li>
@@ -57,13 +51,13 @@
 					<li class="quick-link-2"><a href ng-click="lastSnapshot()"> <span
 							class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
 					</a></li>
-					<li class="quick-link-2"><span class="separator"></span></li>
+					<!--li class="quick-link-2"><span class="separator"></span></li>
 					<li class="quick-link-2"><a href> <span
 							class="glyphicon glyphicon-search" aria-hidden="true"></span>
 					</a></li>
 					<li class="quick-link-2"><input type="text"
 						class="form-control search-input" aria-describedby="basic-addon2"
-						placeholder="Search Products"></li>
+						placeholder="Search Products"></li-->
 				</ul>
 			</div>
 		</div>
@@ -71,18 +65,18 @@
 	<div class="main-container">
 		<div class="sidebar">
 			<ul class="sidebar-menu">
-				<li class="start"><a href><span class="glyphicon glyphicon-home"
+				<!--li class="start"><a href><span class="glyphicon glyphicon-home"
 						aria-hidden="true"></span> </a></li>
 				<li><a href><span class="glyphicon glyphicon-th-list"
-						aria-hidden="true"></span> </a></li>
+						aria-hidden="true"></span> </a></li-->
 				<li><a href><span sidebar-play-btn class="glyphicon glyphicon-pause" ng-attr-play="on"
 						aria-hidden="true"></span> </a></li>
 				<li><a href><span sidebar-filter-btn class="glyphicon glyphicon-filter"
 						aria-hidden="true"></span> </a></li>
-				<li><a href><span class="glyphicon glyphicon-music"
+				<!--li><a href><span class="glyphicon glyphicon-music"
 						aria-hidden="true"></span> </a></li>
 				<li><a href><span sidebar-alert-btn class="glyphicon glyphicon-volume-up" ng-attr-volume="on"
-						aria-hidden="true"></span> </a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li>
+						aria-hidden="true"></span> </a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li-->	
 			</ul>
 		</div>
 		<div ng-view class="page-content"></div>
@@ -93,13 +87,34 @@
 	<script src="bower_components/angular-route/angular-route.js"></script>
 	<script src="bower_components/angular-resource/angular-resource.js"></script>
 	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+	<script src="bower_components/mustache.js/mustache.js"></script>
 	<script src="app.js"></script>
 	<script src="snapshot/snapshot.js"></script>
 	<script src="menu/menu.js"></script>
 	<script src="filter/filter.js"></script>
 	<script src="sidebar/sidebar.js"></script>
-	<!--script src="components/version/version.js"></script>
-	<script src="components/version/version-directive.js"></script>
-	<script src="components/version/interpolate-filter.js"></script-->
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

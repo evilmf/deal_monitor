@@ -128,7 +128,8 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		}, true);
 }]);
 
-snapshotModule.factory('snapshotService', ['$http', '$log', function($http, $log){
+snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'categorizeFilter', 
+                                           function($http, $log, orderFilter, categorizeFilter){
 	var getSnapshotById = function(snapshotId) {
 		var url = '/af/getSnapshot/' + snapshotId;
 		return $http.get(url);
@@ -144,9 +145,52 @@ snapshotModule.factory('snapshotService', ['$http', '$log', function($http, $log
 		return $http.get(url);
 	};
 	
+	var getSnapshotContent = function(products) {
+		var filteredProducts = {};
+		filteredProducts['new'] = [];
+		filteredProducts['existing'] = [];
+		
+		angular.forEach(products, function(product, productId) {
+			if(product.isNew) {
+				filteredProducts['new'].push(product);
+			}
+			else {
+				filteredProducts['existing'].push(product);
+			}
+		});
+		
+		filteredProducts['new'] = categorizeFilter(filteredProducts['new']);
+		filteredProducts['new'] = orderFilter(filteredProducts['new']);
+		filteredProducts['existing'] = categorizeFilter(filteredProducts['existing']);
+		filteredProducts['existing'] = orderFilter(filteredProducts['existing']);
+		
+		var tpl = '{{#new}}' 
+			+ '<div class="prod-cnt pull-left">'
+			+ '<div><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
+			+ '<div class="prod-name"><a href>{{productName}}</a></div>'
+			+ '<div class="prod-price"><a href>{{priceDiscount}} - {{priceRegular}}</a></div>'
+			+ '<div class="prod-cat"><a href>{{categoryName}}</a></div>'
+			+ '</div>'
+			+ '{{/new}}'
+			+ '<div style="clear: both;"><div>'
+			+ '{{#existing}}' 
+			+ '<div class="prod-cnt pull-left">'
+			+ '<div><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
+			+ '<div class="prod-name"><a href>{{productName}}</a></div>'
+			+ '<div class="prod-price"><a href>{{priceDiscount}} - {{priceRegular}}</a></div>'
+			+ '<div class="prod-cat"><a href>{{categoryName}}</a></div>'
+			+ '</div>'
+			+ '{{/existing}}';
+		
+		var rendered = Mustache.render(tpl, filteredProducts);
+		
+		return rendered;
+	};
+	
 	return {getSnapshotById : getSnapshotById,
 			getSnapshotNoDetail : getSnapshotNoDetail,
-			initSnapshot : initSnapshot};
+			initSnapshot : initSnapshot,
+			getSnapshotContent : getSnapshotContent};
 }]);
 
 snapshotModule.filter('categorize', ['$log', 'snapshotFilterService', function($log, snapshotFilterService){
@@ -156,6 +200,10 @@ snapshotModule.filter('categorize', ['$log', 'snapshotFilterService', function($
 		
 		if(filteredCategory == undefined) {
 			filteredCategory = snapshotFilterService.loadCategoryFromCookies();
+		}
+		
+		if(filteredCategory == undefined) {
+			filteredCategory = snapshotFilterService.setDefaultCategory(products);
 		}
 		
 		angular.forEach(products, function(product, productId) {
@@ -189,6 +237,26 @@ snapshotModule.filter('order', ['$log', function($log) {
 		}
 		
 		return orderedProducts;
+	};
+}]);
+
+snapshotModule.directive('snapshotDetail', ['$rootScope', '$log', 'orderFilter', 'categorizeFilter', 'snapshotService', '$compile',
+                                            function($rootScope, $log, orderFilter, categorizeFilter, snapshotService, $compile) {
+	return {
+		restrict: 'E',
+		link: function(scope, element, attrs) {
+	        $rootScope.$watch('snapshotDetail', function(o, n) {
+	        	$log.log('snapshotDetail changed');
+	        	var content = snapshotService.getSnapshotContent($rootScope.snapshotDetail);
+	        	element.html(content);
+	        }, true);
+	        
+	        $rootScope.$watch('filteredCategory', function(o, n) {
+	        	$log.log('filteredCategory changed');
+	        	var content = snapshotService.getSnapshotContent($rootScope.snapshotDetail);
+	        	element.html(content);
+	        }, true);
+	    }
 	};
 }]);
 
