@@ -28,10 +28,6 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 		var categoryFilter = loadCategoryFromCookies();
 		
 		angular.forEach(products, function(product) {
-			if(categoryFilter == null) {
-				categoryFilter = {};
-			}
-			
 			if(categoryFilter[product['brandId']] == undefined) {
 				categoryFilter[product['brandId']] = {};
 			}
@@ -67,10 +63,6 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 		var defaultCategory = /outerwear|jacket/i;
 		
 		angular.forEach(products, function(product) {
-			if(categoryFilter == null) {
-				categoryFilter = {};
-			}
-			
 			if(categoryFilter[product['brandId']] == undefined) {
 				categoryFilter[product['brandId']] = {};
 			}
@@ -89,7 +81,7 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 	};
 	
 	var loadCategoryFromCookies = function() {
-		var brands = null;
+		var brands = {};
 		
 		angular.forEach($cookies, function(c, i) {
 			try {
@@ -97,10 +89,13 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 					brands = {};
 				}
 				
-				var categories = JSON.parse(c);
-				var brand = i;
+				if(!isNaN(i)) {
 				
-				brands[brand] = categories;
+					var categories = JSON.parse(c);
+					var brand = i;
+					
+					brands[brand] = categories;
+				}
 			}
 			catch(error) {
 				$log.log(error.message);
@@ -183,6 +178,20 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 		return cookieCategories;
 	};
 	
+	var hasFilteredCategory = function(filteredCategory) {
+		var hasFilteredCategory = false;
+		
+		if(filteredCategory != undefined) {
+			angular.forEach(filteredCategory, function(brand, brandId) {
+				if(!isNaN(brandId)) {
+					hasFilteredCategory = true;
+				}
+			});
+		}
+		
+		return hasFilteredCategory;
+	};
+	
 	return {getCategories : getCategories,
 			getClassification : getClassification,
 			loadCategory : loadCategory,
@@ -190,5 +199,6 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 			buildOptions : buildOptions,
 			processCategoryFilter : processCategoryFilter,
 			loadCategoryFromCookies : loadCategoryFromCookies,
-			setDefaultCategory : setDefaultCategory};
+			setDefaultCategory : setDefaultCategory,
+			hasFilteredCategory : hasFilteredCategory};
 }]);

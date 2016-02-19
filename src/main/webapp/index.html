@@ -63,19 +63,19 @@
 		</div>
 	</div>
 	<div class="main-container">
-		<div class="sidebar">
+		<div ng-controller="sidebarCtrl" class="sidebar">
 			<ul class="sidebar-menu">
 				<li class="start"><a href><span class="glyphicon glyphicon-home"
 						aria-hidden="true"></span> </a></li>
 				<li><a href><span class="glyphicon glyphicon-th-list"
 						aria-hidden="true"></span> </a></li>
-				<li><a href><span sidebar-play-btn class="glyphicon glyphicon-pause" ng-attr-play="on"
+				<li sidebar-play-btn><a href><span class="glyphicon glyphicon-pause" ng-attr-play="on"
 						aria-hidden="true"></span> </a></li>
-				<li><a href><span sidebar-filter-btn class="glyphicon glyphicon-filter"
+				<li sidebar-filter-btn><a href><span class="glyphicon glyphicon-filter"
 						aria-hidden="true"></span> </a></li>
 				<li><a href><span class="glyphicon glyphicon-music"
 						aria-hidden="true"></span> </a></li>
-				<li><a href><span sidebar-alert-btn class="glyphicon glyphicon-volume-up" ng-attr-volume="on"
+				<li sidebar-alert-btn><a href><span class="glyphicon glyphicon-volume-up" ng-attr-volume="on"
 						aria-hidden="true"></span> </a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li>	
 			</ul>
 		</div>

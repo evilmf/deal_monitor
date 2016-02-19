@@ -4,6 +4,7 @@ body, html {
   height: 100%;
   min-width: 600px;
   width: 100%;
+  text-transform: capitalize;
 }
 
 .header {
@@ -19,6 +20,7 @@ body, html {
 .navbar {
 	min-height: 60px;
 	width: 100%;
+	z-index: 1000;
 }
 
 .sidebar {
@@ -39,7 +41,7 @@ body, html {
 .page-content {
     padding-top: 60px;
     width: 100%;
-    height: 1500px;
+    height: 100%;
     z-index: 10;
     padding-left: 50px;
 }
@@ -172,55 +174,103 @@ body, html {
 }
 
 .snapshot-cnt {
-    padding: 0 0 0 5px;
-    /*border: 1px solid gray;*/
+    padding: 1px 0 0 5px;
     height: 100%;
     width: 100%;
+    /*background-color: #e4e4e4;*/
 }
 
 .prod-cnt {
     width: 230px;
-    height: 330px;
-    /*border: 1px solid gray;*/
-    text-align: center;
+    height: 350px;
+    /*text-align: center;*/
+    margin-right: 5px;
+    margin-bottom: 10px;
+    border-color: #adadad;
+    border-style: solid;
+    border-width: 1px 1px 3px 1px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.prod-img-cnt {
+	padding: 10px 10px 7px 10px;
 }
 
 .prod-img {
-    width: 226px;
-    height: 226px;
+    width: 206px;
+    height: 206px;
+}
+
+.prod-brand {
+	font-family: arial,sans-serif;
+    font-weight: 500;
+    font-style: italic;
+    color: #999;
+    display: inline-block;
+    font-size: 13px;
+    padding: 0 0 4px 10px;
+    max-width: 130px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-top: 1px;
 }
 
 .prod-name {
-    overflow: hidden;
+    overflow: wrapped;
+    line-height: 15px;
+    height: 35px;
+    padding: 0 0 10px 10px;
 }
 
 .prod-name > a {
     text-decoration: none;
-    font-size: 24px;
-    color: #212121;
-    white-space: nowrap;
+    font-size: 13px;
+    color: #0072bc;
+    font-family: arial, sans-serif;
+    font-weight: 400;
+}
+
+.prod-price {
+	border-top: 1px solid #e5e5e5;
+    color: #999;
+    display: block;
+    height: 45px;
+    padding: 6px 10px 0 10px;
+    position: relative;
 }
 
 .prod-price > a {
     text-decoration: none;
-    font-size: 24px;
-    color: blue;
+    font-family: "Open Sans Bold", "Open Sans", Arial, sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    color: #60a430;
+    font-size: 15px;
+    max-width: 100px;
+    line-height: 18px;
+    overflow: hidden;
     white-space: nowrap;
+    text-overflow: ellipsis;
+    display: inline-block;
+    clear: both;
 }
 
 .prod-cat > a {
-    text-decoration: none;
-    font-size: 24px;
-    color: rgb(176, 50, 28);
+    font-family: "Open Sans Italic", "Open Sans", Arial, sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    margin-top: -3px;
+    padding-left: 3px;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.prod-cnt:nth-child(even) {
-    background-color: #fffbef;
-}
-
-.prod-cnt:nth-child(odd) {
-    background-color: #DAF0DD;
+    color: #999;
+    text-decoration: none;
 }
 
 .filter-modal-cnt .modal-dialog {
@@ -241,5 +291,6 @@ body, html {
 #filterCheckbox {
 	padding-left: 10px;
 }
+
 
 

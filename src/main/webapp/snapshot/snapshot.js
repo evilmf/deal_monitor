@@ -98,7 +98,7 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 	
 	var checkSnapshotUpdate = function() {
 		$interval(function() {
-			if(!$rootScope.updateOn) {
+			if(!$rootScope.play) {
 				return;
 			}
 			
@@ -146,11 +146,13 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 	};
 	
 	var getSnapshotContent = function(products) {
+		$log.log(products);
+		var categorizedProducts = categorizeFilter(products);
 		var filteredProducts = {};
 		filteredProducts['new'] = [];
 		filteredProducts['existing'] = [];
-		
-		angular.forEach(products, function(product, productId) {
+				
+		angular.forEach(categorizedProducts, function(product, productId) {
 			if(product.isNew) {
 				filteredProducts['new'].push(product);
 			}
@@ -159,26 +161,26 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 			}
 		});
 		
-		filteredProducts['new'] = categorizeFilter(filteredProducts['new']);
 		filteredProducts['new'] = orderFilter(filteredProducts['new']);
-		filteredProducts['existing'] = categorizeFilter(filteredProducts['existing']);
 		filteredProducts['existing'] = orderFilter(filteredProducts['existing']);
 		
 		var tpl = '{{#new}}' 
 			+ '<div class="prod-cnt pull-left">'
-			+ '<div><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
-			+ '<div class="prod-name"><a href>{{productName}}</a></div>'
-			+ '<div class="prod-price"><a href>{{priceDiscount}} - {{priceRegular}}</a></div>'
-			+ '<div class="prod-cat"><a href>{{categoryName}}</a></div>'
+			+ '<div class="prod-img-cnt"><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
+			+ '<div class="prod-brand"><span>{{brandName}}</span></div>'
+			+ '<div class="prod-name"><a href="#">{{productName}}</a></div>'
+			+ '<div class="prod-price"><a href="#">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
+			//+ '<div class="prod-cat"><a href="#">{{categoryName}}</a></div>'
 			+ '</div>'
 			+ '{{/new}}'
 			+ '<div style="clear: both;"><div>'
 			+ '{{#existing}}' 
 			+ '<div class="prod-cnt pull-left">'
-			+ '<div><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
-			+ '<div class="prod-name"><a href>{{productName}}</a></div>'
-			+ '<div class="prod-price"><a href>{{priceDiscount}} - {{priceRegular}}</a></div>'
-			+ '<div class="prod-cat"><a href>{{categoryName}}</a></div>'
+			+ '<div class="prod-img-cnt"><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
+			+ '<div class="prod-brand"><span>{{brandName}}</span></div>'
+			+ '<div class="prod-name"><a href="#">{{productName}}</a></div>'
+			+ '<div class="prod-price"><a href="#">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
+			//+ '<div class="prod-cat"><a href="#">{{categoryName}}</a></div>'
 			+ '</div>'
 			+ '{{/existing}}';
 		
@@ -202,7 +204,8 @@ snapshotModule.filter('categorize', ['$log', 'snapshotFilterService', function($
 			filteredCategory = snapshotFilterService.loadCategoryFromCookies();
 		}
 		
-		if(filteredCategory == undefined) {
+		if(!snapshotFilterService.hasFilteredCategory(filteredCategory)) {
+			$log.log('Set default category');
 			filteredCategory = snapshotFilterService.setDefaultCategory(products);
 		}
 		

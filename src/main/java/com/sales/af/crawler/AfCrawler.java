@@ -100,7 +100,7 @@ public class AfCrawler extends ProductQueue {
 						String productName = prodInfo.text();
 						String productUrl = prodInfo.absUrl("href");
 						String imageUrl = String
-								.format("http://anf.scene7.com/is/image/anf/anf_%s_01_prod1?$category-r-anf$",
+								.format("http://anf.scene7.com/is/image/anf/anf_%s_01_prod1",
 										dataCollectionId);
 						Elements prodPrice = p
 								.select(".product-price-v2__inner>span");
