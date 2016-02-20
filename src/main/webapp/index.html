@@ -20,7 +20,7 @@
 		<div class="header-quick-nav">
 			<div class="pull-left">
 				<ul class="nav quick-section nav-left">
-					<li class="quick-link"><a href> <span
+					<li class="quick-link" sidebar-ctrl-btn><a href> <span
 							class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
 					</a></li>
 					<li class="quick-link-2"><span class="header-padding"
@@ -63,7 +63,7 @@
 		</div>
 	</div>
 	<div class="main-container">
-		<div ng-controller="sidebarCtrl" class="sidebar">
+		<div ng-controller="sidebarCtrl" class="sidebar" ng-show="showSidebar">
 			<ul class="sidebar-menu">
 				<li class="start"><a href><span class="glyphicon glyphicon-home"
 						aria-hidden="true"></span> </a></li>
@@ -79,7 +79,7 @@
 						aria-hidden="true"></span> </a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li>	
 			</ul>
 		</div>
-		<div ng-view class="page-content"></div>
+		<div ng-view class="page-content" ng-style="$root.pageCntStyle"></div>
 	</div>
 
 	<script src="bower_components/angular/angular.js"></script>

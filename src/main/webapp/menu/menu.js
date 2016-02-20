@@ -3,6 +3,9 @@
 var menuModule = angular.module('myApp.menu', []);
 
 menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$rootScope', function(snapshotService, menuService, $log, $rootScope) {
+	$rootScope.showSidebar = false;
+	$rootScope.pageCntStyle = {'padding-left': '10px'};
+	
 	$rootScope.nextSnapshot = function() {
 		$rootScope.currentSnapshotId = menuService.getNextSnapshotId($rootScope.currentSnapshotId, $rootScope.latestSnapshotId);
 	};
@@ -20,6 +23,25 @@ menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$r
 			$rootScope.currentSnapshotId = id;
 		}
 	};
+}]);
+
+menuModule.directive('sidebarCtrlBtn', ['$log', '$rootScope', function($log, $rootScope) {
+	var link = function(scope, element, attr) {
+		element.on('click', function(event) {
+			if($rootScope.showSidebar) {
+				$rootScope.showSidebar = false;
+				$rootScope.pageCntStyle = {'padding-left': '10px'};
+			}
+			else {
+				$rootScope.showSidebar = true;
+				$rootScope.pageCntStyle = {'padding-left': '50px'};
+			}
+			
+			$rootScope.$apply();
+		});
+	};
+	
+	return {link : link};
 }]);
 
 menuModule.factory('menuService', ['$log', function($log){

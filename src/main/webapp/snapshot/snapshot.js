@@ -170,17 +170,15 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 			+ '<div class="prod-brand"><span>{{brandName}}</span></div>'
 			+ '<div class="prod-name"><a href="#">{{productName}}</a></div>'
 			+ '<div class="prod-price"><a href="#">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
-			//+ '<div class="prod-cat"><a href="#">{{categoryName}}</a></div>'
 			+ '</div>'
 			+ '{{/new}}'
-			+ '<div style="clear: both;"><div>'
+			+ '<div style="clear: both;"></div>'
 			+ '{{#existing}}' 
 			+ '<div class="prod-cnt pull-left">'
 			+ '<div class="prod-img-cnt"><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
 			+ '<div class="prod-brand"><span>{{brandName}}</span></div>'
 			+ '<div class="prod-name"><a href="#">{{productName}}</a></div>'
 			+ '<div class="prod-price"><a href="#">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
-			//+ '<div class="prod-cat"><a href="#">{{categoryName}}</a></div>'
 			+ '</div>'
 			+ '{{/existing}}';
 		
