@@ -106,7 +106,7 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 	};
 	
 	var getClassification = function() {
-		var url = '/af/getClassification';
+		var url = '/getClassification';
 		var promise = $http.get(url).then(function(result) {
 			return result;
 		},

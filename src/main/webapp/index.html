@@ -25,7 +25,7 @@
 					</a></li>
 					<li class="quick-link-2"><span class="header-padding"
 						aria-hidden="true"></span></li>
-					<li class="quick-link-2"><a href> <span
+					<li class="quick-link-2"><a class="disabled" href> <span
 							class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
 					</a></li>
 					<li class="quick-link-2"><span class="separator"></span></li>
@@ -53,11 +53,11 @@
 					</a></li>
 					<li class="quick-link-2"><span class="separator"></span></li>
 					<li class="quick-link-2"><a href> <span
-							class="glyphicon glyphicon-search" aria-hidden="true"></span>
+							class="glyphicon glyphicon-search disabled" aria-hidden="true"></span>
 					</a></li>
 					<li class="quick-link-2"><input type="text"
-						class="form-control search-input" aria-describedby="basic-addon2"
-						placeholder="Search Products"></li>
+						class="form-control search-input disabled" aria-describedby="basic-addon2"
+						placeholder="Search Products" disabled></li>
 				</ul>
 			</div>
 		</div>
@@ -67,14 +67,14 @@
 			<ul class="sidebar-menu">
 				<li class="start"><a href><span class="glyphicon glyphicon-home"
 						aria-hidden="true"></span> </a></li>
-				<li><a href><span class="glyphicon glyphicon-th-list"
+				<li sidebar-setting-btn><a href><span class="glyphicon glyphicon-th-list"
 						aria-hidden="true"></span> </a></li>
 				<li sidebar-play-btn><a href><span class="glyphicon glyphicon-pause" ng-attr-play="on"
 						aria-hidden="true"></span> </a></li>
 				<li sidebar-filter-btn><a href><span class="glyphicon glyphicon-filter"
 						aria-hidden="true"></span> </a></li>
-				<li><a href><span class="glyphicon glyphicon-music"
-						aria-hidden="true"></span> </a></li>
+				<!--li><a href><span class="glyphicon glyphicon-music"
+						aria-hidden="true"></span> </a></li-->
 				<li sidebar-alert-btn><a href><span class="glyphicon glyphicon-volume-up" ng-attr-volume="on"
 						aria-hidden="true"></span> </a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li>	
 			</ul>
@@ -92,6 +92,7 @@
 	<script src="snapshot/snapshot.js"></script>
 	<script src="menu/menu.js"></script>
 	<script src="filter/filter.js"></script>
+	<script src="setting/setting.js"></script>
 	<script src="sidebar/sidebar.js"></script>
 </body>
 </html>

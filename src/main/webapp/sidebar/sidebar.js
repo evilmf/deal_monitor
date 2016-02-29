@@ -96,6 +96,22 @@ sidebarModule.directive('sidebarFilterBtn', ['$log', '$modal', function($log, $m
 	return {link : link};
 }]);
 
+sidebarModule.directive('sidebarSettingBtn', ['$log', '$modal', function($log, $modal) {
+	var link = function(scope, element, attr) {
+		element.on('click', function(event) {
+			$modal.open({
+				templateUrl : 'setting/snapshotSetting.html',
+				windowClass : 'setting-modal-cnt',
+				backdrop : true,
+				backdropClass : 'filter-backdrop-fade',
+				controller: 'snapshotSettingCtrl'
+			});
+		});
+	};
+	
+	return {link : link};
+}]);
+
 sidebarModule.directive('sidebarAlertBtn', ['$log', '$rootScope', 'sidebarService', function($log, $rootScope, sidebarService) {
 	var link = function(scope, element, attr) {
 		var e = element.find('a').find('span');

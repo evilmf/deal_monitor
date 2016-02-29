@@ -182,21 +182,25 @@ body, html {
 
 .prod-cnt {
     width: 230px;
-    height: 350px;
+    height: 372px;
     /*text-align: center;*/
     margin-right: 5px;
     margin-bottom: 10px;
     border-color: #adadad;
     border-style: solid;
-    border-width: 1px 1px 3px 1px;
+    border-width: 1px 1px 2px 1px;
     border-radius: 4px;
     background-color: #fff;
 }
 
 .prod-img-cnt {
 	padding: 10px 10px 7px 10px;
+	position: relative;
 }
 
+.disabled {
+	cursor: not-allowed;
+}
 .prod-img {
     width: 206px;
     height: 206px;
@@ -288,8 +292,86 @@ body, html {
 	height: 100%;
 }
 
+.setting-modal-cnt .modal-dialog {
+	width: 400px;
+	min-height: 400px;
+}
+
+.setting-modal-cnt .modal-dialog .modal-content {
+	width: 400px;
+	min-height: 350px;
+	padding: 20px;
+}
+
 #filterCheckbox {
 	padding-left: 10px;
+}
+
+.new {
+	display: inline;
+	position: absolute;
+	left: 179px;
+    background-color: #ef6e2b;
+    color: #fff;
+    font-family: arial, sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    padding: 3px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-style: normal;
+}
+
+.prod-cnt-foot {
+	background-color: #fcfcfc;
+    color: #c7c7c7;
+    border-radius: 0 0 4px 4px;
+    border-top: 1px solid #D6D6D6;
+    height: 38px;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.prod-cnt-foot-left {
+	display: block;
+    width: 114px;
+    height: 38px;
+    border-right: 1px solid #D6D6D6;
+    line-height: 18px;
+    padding-top: 11px;
+}
+
+.prod-cnt-foot-right {
+	display: block;
+    width: 113px;
+    height: 38px;
+    line-height: 18px;
+    padding-top: 11px;
+}
+
+.filter-input-list {
+	padding-left: 0;
+    margin-left: -9px;
+}
+
+.filter-input-separator {
+	display: block;
+    text-transform: none;
+    font-size: 15px;
+    font-weight: 400;
+    margin: 1px 0 0 0;
+    padding: 0 15px 0 23px;
+}
+
+.filter-setting {
+	padding: 4px 10px;
+	height: 28px;
+}
+
+.setting-filter-cnt {
+	height: 47px;
+	width: 100%;
 }
 
 

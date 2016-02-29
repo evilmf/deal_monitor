@@ -128,26 +128,29 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		}, true);
 }]);
 
-snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'categorizeFilter', 
-                                           function($http, $log, orderFilter, categorizeFilter){
+snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'categorizeFilter', 'discountFilter', 'priceFilter',
+                                           function($http, $log, orderFilter, categorizeFilter, discountFilter, priceFilter){
 	var getSnapshotById = function(snapshotId) {
-		var url = '/af/getSnapshot/' + snapshotId;
+		var url = '/getSnapshot/' + snapshotId;
 		return $http.get(url);
 	};
 	
 	var getSnapshotNoDetail = function() {
-		var url = '/af/getSnapshotNoDetail';
+		var url = '/getSnapshotNoDetail';
 		return $http.get(url);
 	}; 
 	
 	var initSnapshot = function() {
-		var url = '/af/getSnapshot';
+		var url = '/getSnapshot';
 		return $http.get(url);
 	};
 	
 	var getSnapshotContent = function(products) {
-		$log.log(products);
+		//$log.log(products);
 		var categorizedProducts = categorizeFilter(products);
+		categorizedProducts = discountFilter(categorizedProducts);
+		categorizedProducts = priceFilter(categorizedProducts);
+		
 		var filteredProducts = {};
 		filteredProducts['new'] = [];
 		filteredProducts['existing'] = [];
@@ -163,22 +166,29 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 		
 		filteredProducts['new'] = orderFilter(filteredProducts['new']);
 		filteredProducts['existing'] = orderFilter(filteredProducts['existing']);
+		filteredProducts['percentOff'] = function() { return Math.round(this.discount * 100); };
+		filteredProducts['ebaySearchKeyword'] = function() { return encodeURIComponent(this.productName + ' ' + this.brandName); };
 		
 		var tpl = '{{#new}}' 
 			+ '<div class="prod-cnt pull-left">'
-			+ '<div class="prod-img-cnt"><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
+			+ '<div class="prod-img-cnt">'
+			+ '<span class="new">NEW</span>'
+			+ '<a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
 			+ '<div class="prod-brand"><span>{{brandName}}</span></div>'
 			+ '<div class="prod-name"><a href="#">{{productName}}</a></div>'
-			+ '<div class="prod-price"><a href="#">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
+			+ '<div class="prod-price"><a target=_blank href="http://www.ebay.com/sch/i.html?_nkw={{ebaySearchKeyword}}">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
+			+ '<div class="prod-cnt-foot"><div class="prod-cnt-foot-left pull-left">{{percentOff}}% OFF</div><div class="prod-cnt-foot-right pull-left">{{genderName}}</div></div>'
 			+ '</div>'
 			+ '{{/new}}'
 			+ '<div style="clear: both;"></div>'
 			+ '{{#existing}}' 
 			+ '<div class="prod-cnt pull-left">'
-			+ '<div class="prod-img-cnt"><a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
+			+ '<div class="prod-img-cnt">'
+			+ '<a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
 			+ '<div class="prod-brand"><span>{{brandName}}</span></div>'
 			+ '<div class="prod-name"><a href="#">{{productName}}</a></div>'
-			+ '<div class="prod-price"><a href="#">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
+			+ '<div class="prod-price"><a target=_blank href="http://www.ebay.com/sch/i.html?_nkw={{ebaySearchKeyword}}">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
+			+ '<div class="prod-cnt-foot"><div class="prod-cnt-foot-left pull-left">{{percentOff}}% OFF</div><div class="prod-cnt-foot-right pull-left">{{genderName}}</div></div>'
 			+ '</div>'
 			+ '{{/existing}}';
 		
@@ -241,6 +251,48 @@ snapshotModule.filter('order', ['$log', function($log) {
 	};
 }]);
 
+snapshotModule.filter('discount', ['$log', 'snapshotSettingService', function($log, snapshotSettingService) {
+	return function(products) {
+		var setting = snapshotSettingService.loadSetting();
+		
+		var filteredProducts = {};
+		
+		angular.forEach(products, function(product, productId) {
+			try {
+				if(product.discount >= setting.minDiscount / 100 && product.discount <= setting.maxDiscount / 100) {
+					filteredProducts[productId] = product;
+				}
+			}
+			catch (error) {
+				$log.log('[Error] Un-expected exception when processing product through discount filter for productId: ' + productId);
+			}
+		});
+		
+		return filteredProducts;
+	};
+}]);
+
+snapshotModule.filter('price', ['$log', 'snapshotSettingService', function($log, snapshotSettingService) {
+	return function(products) {
+		var setting = snapshotSettingService.loadSetting();
+		
+		var filteredProducts = {};
+		
+		angular.forEach(products, function(product, productId) {
+			try {
+				if(product.priceDiscount >= setting.minPrice && product.priceDiscount <= setting.maxPrice) {
+					filteredProducts[productId] = product;
+				}
+			}
+			catch (error) {
+				$log.log('[Error] Un-expected exception when processing product through price filter for productId: ' + productId);
+			}
+		});
+		
+		return filteredProducts;
+	};
+}]);
+
 snapshotModule.directive('snapshotDetail', ['$rootScope', '$log', 'orderFilter', 'categorizeFilter', 'snapshotService', '$compile',
                                             function($rootScope, $log, orderFilter, categorizeFilter, snapshotService, $compile) {
 	return {
@@ -254,6 +306,12 @@ snapshotModule.directive('snapshotDetail', ['$rootScope', '$log', 'orderFilter',
 	        
 	        $rootScope.$watch('filteredCategory', function(o, n) {
 	        	$log.log('filteredCategory changed');
+	        	var content = snapshotService.getSnapshotContent($rootScope.snapshotDetail);
+	        	element.html(content);
+	        }, true);
+	        
+	        $rootScope.$watch('setting', function(o, n) {
+	        	$log.log('setting changed');
 	        	var content = snapshotService.getSnapshotContent($rootScope.snapshotDetail);
 	        	element.html(content);
 	        }, true);
