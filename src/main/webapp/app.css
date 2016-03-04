@@ -21,6 +21,7 @@ body, html {
 	min-height: 60px;
 	width: 100%;
 	z-index: 1000;
+	/*border-bottom-color: #d1cfc5;*/
 }
 
 .sidebar {
@@ -85,7 +86,7 @@ body, html {
 }
 
 .nav-left {
-    width: 600px;
+    width: 650px;
 }
 
 .separator {
@@ -374,5 +375,21 @@ body, html {
 	width: 100%;
 }
 
+.loading-cnt {
+	height: 24px;
+	width: 35px;
+}
 
+.tooltip-inner {
+	background-color: white;
+    color: #333333;
+    border: 1px solid #e1e1e1;
+}
 
+.tooltip.bottom .tooltip-arrow {
+	border-bottom-color: rgba(0, 0, 0, 0.16);
+}
+
+.menu-btn-pointer {
+	cursor: pointer;
+}

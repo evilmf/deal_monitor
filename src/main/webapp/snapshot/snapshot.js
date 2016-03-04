@@ -9,10 +9,11 @@ snapshotModule.config(['$routeProvider', function($routeProvider) {
   });
 }]);
 
-snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScope', '$interval', function(snapshotService, $log, $rootScope, $interval) {
+snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScope', '$interval', 'usSpinnerService', function(snapshotService, $log, $rootScope, $interval, usSpinnerService) {
 	$rootScope.latestSnapshotId = null;
 	$rootScope.currentSnapshotId = null;
 	$rootScope.snapshotDetail = null;
+	$rootScope.snapshotTimestamp = null;
 	$rootScope.updateOn = true;
 	$rootScope.alertOn = true;
 	
@@ -20,15 +21,20 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 	
 	var getSnapshotById = function(id) {
 		inProgress = true;
+		usSpinnerService.spin('loading');
 		snapshotService.getSnapshotById(id).success(function(res) {
 			$log.log('getSnapshotById - setting $scope.snapshotDetail');
 			$rootScope.snapshotDetail = res['snapshotDetail'];
+			$rootScope.snapshotTimestamp = res['createDate'];
 		}).
 		error(function(res) {
 			$log.log('Error from getSnapshotById');
 			$log.log(res);
 		}).
 		finally(function() {
+			if($rootScope.currentSnapshotId == id) {
+				usSpinnerService.stop('loading');
+			}
 			inProgress = false;
 		});
 	};
@@ -39,17 +45,20 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		}
 		
 		inProgress = true;
+		usSpinnerService.spin('loading');
 		snapshotService.initSnapshot().success(function(res) {
 			$log.log('initSnapshot - setting $scope.snapshotDetail');
 			$rootScope.currentSnapshotId = res['snapshotId'];
 			$rootScope.latestSnapshotId = res['snapshotId'];
 			$rootScope.snapshotDetail = res['snapshotDetail'];
+			$rootScope.snapshotTimestamp = res['createDate'];
 		}).
 		error(function(res) {
 			$log.log(res);
 		}).
 		finally(function() {
 			inProgress = false;
+			usSpinnerService.stop('loading');
 		});
 	};
 	
@@ -79,10 +88,12 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		var sid = $rootScope.latestSnapshotId + 1;
 		snapshotService.getSnapshotById(sid).success(function(res) {
 			if(res['snapshotDetail'] != null) {
+				usSpinnerService.spin('loading');
 				$log.log('snapshotService.getLatestSnapshot');
 				$log.log('New snapshot available.');
 				$log.log('initSnapshot - setting $scope.snapshotDetail');
 				$rootScope.snapshotDetail = res['snapshotDetail'];
+				$rootScope.snapshotTimestamp = res['createDate'];
 				$rootScope.latestSnapshotId = res['snapshotId'];
 				$rootScope.currentSnapshotId = res['snapshotId'];
 			}
@@ -93,6 +104,7 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		}).
 		finally(function() {
 			inProgress = false;
+			usSpinnerService.stop('loading');
 		});		
 	};
 	
@@ -190,7 +202,8 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 			+ '<div class="prod-price"><a target=_blank href="http://www.ebay.com/sch/i.html?_nkw={{ebaySearchKeyword}}">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
 			+ '<div class="prod-cnt-foot"><div class="prod-cnt-foot-left pull-left">{{percentOff}}% OFF</div><div class="prod-cnt-foot-right pull-left">{{genderName}}</div></div>'
 			+ '</div>'
-			+ '{{/existing}}';
+			+ '{{/existing}}'
+			+ '<div style="clear: both;"></div>';
 		
 		var rendered = Mustache.render(tpl, filteredProducts);
 		

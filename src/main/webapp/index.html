@@ -20,19 +20,19 @@
 		<div class="header-quick-nav">
 			<div class="pull-left">
 				<ul class="nav quick-section nav-left">
-					<li class="quick-link" sidebar-ctrl-btn><a href> <span
+					<li class="quick-link menu-btn-pointer" sidebar-ctrl-btn><span
 							class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
-					</a></li>
+					</li>
 					<li class="quick-link-2"><span class="header-padding"
 						aria-hidden="true"></span></li>
-					<li class="quick-link-2"><a class="disabled" href> <span
+					<li class="quick-link-2 disabled" tooltip="{{snapshotTimestamp | date:'yyyy-MM-dd HH:mm:ss'}}" tooltip-placement="bottom"><span
 							class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
-					</a></li>
+					</li>
 					<li class="quick-link-2"><span class="separator"></span></li>
-					<li class="quick-link-2"><a href ng-click="preSnapshot()"> <span
+					<li class="quick-link-2 menu-btn-pointer" ng-click="preSnapshot()"> <span
 							class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-					</a></li>
-					<li class="quick-link-2"><input 
+					</li>
+					<li class="quick-link-2"><input
 						ng-model="$root.currentSnapshotId" 
 						type="text"
 						class="form-control page-input page-input-left"
@@ -43,21 +43,22 @@
 					<li class="quick-link-2"><input type="text"
 						class="form-control page-input page-input-right"
 						aria-describedby="basic-addon2" value="{{latestSnapshotId}}" disabled></li>
-					<li class="quick-link-2"><a href ng-click="nextSnapshot()"> <span
+					<li class="quick-link-2 menu-btn-pointer" ng-click="nextSnapshot()"> <span
 							class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-					</a></li>
+					</li>
 					<li class="quick-link-2"><span class="control-separator"></span>
 					</li>
-					<li class="quick-link-2"><a href ng-click="lastSnapshot()"> <span
+					<li class="quick-link-2 menu-btn-pointer" ng-click="lastSnapshot()"> <span
 							class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
-					</a></li>
+					</li>
 					<li class="quick-link-2"><span class="separator"></span></li>
-					<li class="quick-link-2"><a href> <span
+					<li class="quick-link-2"><span
 							class="glyphicon glyphicon-search disabled" aria-hidden="true"></span>
-					</a></li>
+					</li>
 					<li class="quick-link-2"><input type="text"
 						class="form-control search-input disabled" aria-describedby="basic-addon2"
 						placeholder="Search Products" disabled></li>
+					<li class="quick-link-2"><div class="loading-cnt"><span us-spinner="{{spinOpts}}" spinner-key="loading"></span></div></li>
 				</ul>
 			</div>
 		</div>
@@ -88,6 +89,8 @@
 	<script src="bower_components/angular-resource/angular-resource.js"></script>
 	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 	<script src="bower_components/mustache.js/mustache.js"></script>
+	<script src="bower_components/spin.js/spin.js"></script>
+	<script src="bower_components/angular-spinner/angular-spinner.js"></script>
 	<script src="app.js"></script>
 	<script src="snapshot/snapshot.js"></script>
 	<script src="menu/menu.js"></script>

@@ -1,6 +1,6 @@
 'use strict';
 
-var menuModule = angular.module('myApp.menu', []);
+var menuModule = angular.module('myApp.menu', ['ui.bootstrap']);
 
 menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$rootScope', function(snapshotService, menuService, $log, $rootScope) {
 	$rootScope.showSidebar = false;
@@ -23,6 +23,29 @@ menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$r
 			$rootScope.currentSnapshotId = id;
 		}
 	};
+	
+	$rootScope.spinOpts = {
+			  lines: 8 // The number of lines to draw
+			, length: 6 // The length of each line
+			, width: 3 // The line thickness
+			, radius: 7 // The radius of the inner circle
+			, scale: 0.70 // Scales overall size of the spinner
+			, corners: 1 // Corner roundness (0..1)
+			, color: '#000' // #rgb or #rrggbb or array of colors
+			, opacity: 0.25 // Opacity of the lines
+			, rotate: 3 // The rotation offset
+			, direction: 1 // 1: clockwise, -1: counterclockwise
+			, speed: 1 // Rounds per second
+			, trail: 42 // Afterglow percentage
+			, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+			, zIndex: 2e9 // The z-index (defaults to 2000000000)
+			//, className: 'spinner' // The CSS class to assign to the spinner
+			//, top: '50%' // Top position relative to parent
+			//, left: '36%' // Left position relative to parent
+			, shadow: false // Whether to render a shadow
+			, hwaccel: false // Whether to use hardware acceleration
+			, position: 'absolute' // Element positioning
+			};
 }]);
 
 menuModule.directive('sidebarCtrlBtn', ['$log', '$rootScope', function($log, $rootScope) {
