@@ -1,7 +1,7 @@
 package com.sales.af.to;
 
 import java.util.HashMap;
-import java.util.Map;  
+import java.util.Map;
 
 import com.sales.af.bo.Brand;
 import com.sales.af.bo.Category;

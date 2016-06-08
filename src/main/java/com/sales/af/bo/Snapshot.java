@@ -95,7 +95,7 @@ public class Snapshot implements Serializable {
 	public void setBrand(Brand brand) {
 		this.brand = brand;
 	}
-	
+
 	@PrePersist
 	void onCreate() {
 		setCreateDate(new Date());

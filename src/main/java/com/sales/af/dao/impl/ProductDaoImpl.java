@@ -26,9 +26,11 @@ public class ProductDaoImpl implements ProductDao {
 	UtilDao utilDao;
 
 	public Map<String, Product> getProductByProdIdAndBrandId(
-			List<String> productIds, Brand brand) {
+			List<String> productIds, Long brandId) {
 		Query query = entityManager.createNamedQuery(
 				"getProductByProdIdAndBrand", Product.class);
+		Brand brand = new Brand();
+		brand.setId(brandId);
 		query.setParameter("productIds", productIds);
 		query.setParameter("brand", brand);
 

@@ -47,5 +47,14 @@
 	        	</li>
 	        </ul>
 	  	</div>
+	  	<div class="form-group setting-filter-cnt">
+        	<label>Sort By:</label>
+	        <ui-select multiple ng-model="$root.setting.orderBy" theme="select2" ng-disabled="disabled" style="width: 328px;" ng-change="setOrderBy(setting.orderBy)">
+				<ui-select-match placeholder="Select by...">{{$item.name}}</ui-select-match>
+			    <ui-select-choices repeat="by as by in $root.orderByOption | orderByOptionFilter">
+					<div ng-bind-html="by.name | highlight: $select.search"></div>
+			    </ui-select-choices>
+			</ui-select>
+	  	</div>
     </div>
 </div>

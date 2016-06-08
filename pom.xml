@@ -37,6 +37,7 @@
 		<hibernate.version>4.2.3.Final</hibernate.version>
 		<cglib.version>2.2.2</cglib.version>
 		<hibernate-jpa.version>1.0.1.Final</hibernate-jpa.version>
+		<apache.commons.version>3.4</apache.commons.version>
 	</properties>
 
 	<dependencies>
@@ -76,7 +77,14 @@
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring-framework.version}</version>
 		</dependency>
-
+		
+		<!-- Apache Commons -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${apache.commons.version}</version>
+		</dependency>
+		
 		<!-- Logging -->
 		<dependency>
 			<groupId>log4j</groupId>

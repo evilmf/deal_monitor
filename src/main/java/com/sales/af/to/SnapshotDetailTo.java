@@ -5,41 +5,41 @@ import java.util.List;
 
 public class SnapshotDetailTo {
 	private Long snapshotDetailId;
-	
+
 	private Long productId;
-	
+
 	private String productDataId;
-	
+
 	private Date productCreateDate;
-	
+
 	private Long brandId;
-	
+
 	private String brandName;
-	
+
 	private Long genderId;
-	
+
 	private String genderName;
-	
+
 	private Long categoryId;
-	
+
 	private String categoryName;
-	
+
 	private Long snapshotId;
-	
+
 	private float priceRegular;
-	
+
 	private float priceDiscount;
-	
+
 	private float discount;
-	
+
 	private Boolean isNew;
-	
+
 	private Date snapshotCreateDate;
-	
+
 	private List<String> images;
-	
+
 	private String productUrl;
-	
+
 	private String productName;
 
 	public Long getSnapshotDetailId() {
@@ -169,7 +169,7 @@ public class SnapshotDetailTo {
 	public void setImages(List<String> images) {
 		this.images = images;
 	}
-	
+
 	public void addImage(String url) {
 		this.images.add(url);
 	}
@@ -183,18 +183,18 @@ public class SnapshotDetailTo {
 	}
 
 	public String getProductUrl() {
-	    return productUrl;
+		return productUrl;
 	}
 
 	public void setProductUrl(String productUrl) {
-	    this.productUrl = productUrl;
+		this.productUrl = productUrl;
 	}
 
 	public String getProductName() {
-	    return productName;
+		return productName;
 	}
 
 	public void setProductName(String productName) {
-	    this.productName = productName;
+		this.productName = productName;
 	}
 }

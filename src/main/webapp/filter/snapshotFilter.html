@@ -10,7 +10,7 @@
 	    	<div id="filterCheckbox">
 			    <div class="checkbox" ng-repeat="(categoryId, category) in selectedOption.value.category">
 					<label>
-				    	<input type="checkbox" ng-model="category.selected" ng-click=processCategoryFilter({brandId:selectedOption.value.brandId,genderId:selectedOption.value.genderId,categoryId:categoryId,selected:!category.selected})>
+				    	<input type="checkbox" ng-model="category.selected" ng-click=processCategoryFilter({brandId:selectedOption.value.brandId,genderId:selectedOption.value.genderId,categoryId:categoryId,selected:category.selected})>
 				      	{{category.name}}
 				    </label>
 				</div>

@@ -1,6 +1,6 @@
 'use strict';
 
-var snapshotModule = angular.module('myApp.snapshot', ['ngRoute', 'ngResource']);
+var snapshotModule = angular.module('myApp.snapshot', ['ngRoute', 'ngResource', 'ngCookies']);
 
 snapshotModule.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/snapshot', {
@@ -9,13 +9,18 @@ snapshotModule.config(['$routeProvider', function($routeProvider) {
   });
 }]);
 
-snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScope', '$interval', 'usSpinnerService', function(snapshotService, $log, $rootScope, $interval, usSpinnerService) {
+snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScope', '$interval', 'usSpinnerService', '$cookies', function(snapshotService, $log, $rootScope, $interval, usSpinnerService, $cookies) {
 	$rootScope.latestSnapshotId = null;
 	$rootScope.currentSnapshotId = null;
 	$rootScope.snapshotDetail = null;
 	$rootScope.snapshotTimestamp = null;
 	$rootScope.updateOn = true;
 	$rootScope.alertOn = true;
+	$rootScope.orderByOption = [{'field': 'priceDiscount', 'asc': true, 'name': 'Price: ASC'},
+	                            {'field': 'priceDiscount', 'asc': false, 'name': 'Price: DESC'},
+	                            {'field': 'discount', 'asc': false, 'name': '% Off: DESC'},
+	                            {'field': 'discount', 'asc': true, 'name': '% Off: ASC'}
+	                            ];
 	
 	var inProgress = false;
 	
@@ -23,13 +28,11 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		inProgress = true;
 		usSpinnerService.spin('loading');
 		snapshotService.getSnapshotById(id).success(function(res) {
-			$log.log('getSnapshotById - setting $scope.snapshotDetail');
 			$rootScope.snapshotDetail = res['snapshotDetail'];
 			$rootScope.snapshotTimestamp = res['createDate'];
 		}).
 		error(function(res) {
-			$log.log('Error from getSnapshotById');
-			$log.log(res);
+
 		}).
 		finally(function() {
 			if($rootScope.currentSnapshotId == id) {
@@ -47,14 +50,13 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		inProgress = true;
 		usSpinnerService.spin('loading');
 		snapshotService.initSnapshot().success(function(res) {
-			$log.log('initSnapshot - setting $scope.snapshotDetail');
 			$rootScope.currentSnapshotId = res['snapshotId'];
 			$rootScope.latestSnapshotId = res['snapshotId'];
 			$rootScope.snapshotDetail = res['snapshotDetail'];
 			$rootScope.snapshotTimestamp = res['createDate'];
 		}).
 		error(function(res) {
-			$log.log(res);
+
 		}).
 		finally(function() {
 			inProgress = false;
@@ -80,7 +82,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 	
 	var getLatestSnapshot = function() {
 		if(inProgress) {
-			$log.log('Skipping... Getting snapshot in progress.');
 			return;
 		}
 		
@@ -89,9 +90,6 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		snapshotService.getSnapshotById(sid).success(function(res) {
 			if(res['snapshotDetail'] != null) {
 				usSpinnerService.spin('loading');
-				$log.log('snapshotService.getLatestSnapshot');
-				$log.log('New snapshot available.');
-				$log.log('initSnapshot - setting $scope.snapshotDetail');
 				$rootScope.snapshotDetail = res['snapshotDetail'];
 				$rootScope.snapshotTimestamp = res['createDate'];
 				$rootScope.latestSnapshotId = res['snapshotId'];
@@ -99,8 +97,7 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 			}
 		}).
 		error(function(res) {
-			$log.log('Error from getLatestSnapshot');
-			$log.log(res);
+
 		}).
 		finally(function() {
 			inProgress = false;
@@ -140,8 +137,8 @@ snapshotModule.controller('snapshotCtrl', ['snapshotService', '$log', '$rootScop
 		}, true);
 }]);
 
-snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'categorizeFilter', 'discountFilter', 'priceFilter',
-                                           function($http, $log, orderFilter, categorizeFilter, discountFilter, priceFilter){
+snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'categorizeFilter', 'discountFilter', 'priceFilter', '$cookies',
+                                           function($http, $log, orderFilter, categorizeFilter, discountFilter, priceFilter, $cookies){
 	var getSnapshotById = function(snapshotId) {
 		var url = '/getSnapshot/' + snapshotId;
 		return $http.get(url);
@@ -158,7 +155,6 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 	};
 	
 	var getSnapshotContent = function(products) {
-		//$log.log(products);
 		var categorizedProducts = categorizeFilter(products);
 		categorizedProducts = discountFilter(categorizedProducts);
 		categorizedProducts = priceFilter(categorizedProducts);
@@ -216,9 +212,8 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 			getSnapshotContent : getSnapshotContent};
 }]);
 
-snapshotModule.filter('categorize', ['$log', 'snapshotFilterService', function($log, snapshotFilterService){
+snapshotModule.filter('categorize', ['$log', 'snapshotFilterService', '$cookies', function($log, snapshotFilterService, $cookies){
 	return function(products, filteredCategory) {
-		$log.log('categorize' + ' ' + (new Date));
 		var filteredProducts = {};
 		
 		if(filteredCategory == undefined) {
@@ -226,7 +221,6 @@ snapshotModule.filter('categorize', ['$log', 'snapshotFilterService', function($
 		}
 		
 		if(!snapshotFilterService.hasFilteredCategory(filteredCategory)) {
-			$log.log('Set default category');
 			filteredCategory = snapshotFilterService.setDefaultCategory(products);
 		}
 		
@@ -245,26 +239,39 @@ snapshotModule.filter('categorize', ['$log', 'snapshotFilterService', function($
 	};
 }]);
 
-snapshotModule.filter('order', ['$log', function($log) {
+snapshotModule.filter('order', ['$log', 'snapshotSettingService', '$cookies', function($log, snapshotSettingService, $cookies) {
+	
+	var orderBy = function(products, orderBy) {
+		products.sort(function(a, b) {
+			var result = 0;
+			for(var i = 0; i < orderBy.length; i++) {
+				result = (a[orderBy[i]['field']] - b[orderBy[i]['field']]) * (orderBy[i]['asc'] ? 1 : -1);
+				
+				if(result != 0) 
+					break;
+			}
+			
+			return result;
+		});
+	};
+	
 	return function(products) {
-		$log.log('order');
 		var orderedProducts = [];
+		var setting = snapshotSettingService.loadSetting();
 		
 		angular.forEach(products, function(product, productId) {
 			orderedProducts.push(product);
 		});
 		
 		if(orderedProducts.length > 1) {
-			orderedProducts.sort(function(a, b) {
-				return a.priceDiscount - b.priceDiscount;
-			});
+			orderBy(orderedProducts, setting.orderBy);
 		}
 		
 		return orderedProducts;
 	};
 }]);
 
-snapshotModule.filter('discount', ['$log', 'snapshotSettingService', function($log, snapshotSettingService) {
+snapshotModule.filter('discount', ['$log', 'snapshotSettingService', '$cookies', function($log, snapshotSettingService, $cookies) {
 	return function(products) {
 		var setting = snapshotSettingService.loadSetting();
 		
@@ -285,7 +292,7 @@ snapshotModule.filter('discount', ['$log', 'snapshotSettingService', function($l
 	};
 }]);
 
-snapshotModule.filter('price', ['$log', 'snapshotSettingService', function($log, snapshotSettingService) {
+snapshotModule.filter('price', ['$log', 'snapshotSettingService', '$cookies', function($log, snapshotSettingService, $cookies) {
 	return function(products) {
 		var setting = snapshotSettingService.loadSetting();
 		
@@ -306,25 +313,22 @@ snapshotModule.filter('price', ['$log', 'snapshotSettingService', function($log,
 	};
 }]);
 
-snapshotModule.directive('snapshotDetail', ['$rootScope', '$log', 'orderFilter', 'categorizeFilter', 'snapshotService', '$compile',
-                                            function($rootScope, $log, orderFilter, categorizeFilter, snapshotService, $compile) {
+snapshotModule.directive('snapshotDetail', ['$rootScope', '$log', 'orderFilter', 'categorizeFilter', 'snapshotService', '$compile', '$cookies',
+                                            function($rootScope, $log, orderFilter, categorizeFilter, snapshotService, $compile, $cookies) {
 	return {
 		restrict: 'E',
 		link: function(scope, element, attrs) {
 	        $rootScope.$watch('snapshotDetail', function(o, n) {
-	        	$log.log('snapshotDetail changed');
 	        	var content = snapshotService.getSnapshotContent($rootScope.snapshotDetail);
 	        	element.html(content);
 	        }, true);
 	        
 	        $rootScope.$watch('filteredCategory', function(o, n) {
-	        	$log.log('filteredCategory changed');
 	        	var content = snapshotService.getSnapshotContent($rootScope.snapshotDetail);
 	        	element.html(content);
 	        }, true);
 	        
 	        $rootScope.$watch('setting', function(o, n) {
-	        	$log.log('setting changed');
 	        	var content = snapshotService.getSnapshotContent($rootScope.snapshotDetail);
 	        	element.html(content);
 	        }, true);

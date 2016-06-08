@@ -1,4 +1,4 @@
-rmdir /s /q E:\apache-tomcat-7.0.57\webapps\af\
+rmdir /s /q E:\apache-tomcat-7.0.57\webapps\ROOT\
 del e:\apache-tomcat-7.0.57\webapps\af.war
 del /F/ Q e:\apache-tomcat-7.0.57\logs\*
 del /F/ Q e:\apache-tomcat-7.0.57\conf\af.properties

@@ -21,76 +21,76 @@ import com.sales.af.to.SnapshotTo;
 
 @Service
 public class DealApiServiceImpl implements DealApiService {
-    @Autowired
-    SnapshotDetailDao snapshotDeailDao;
-    
-    @Autowired
-    BrandDao brandDao;
-    
-    @Autowired
-    CategoryDao categoryDao;
-    
-    @Autowired
-    GenderDao genderDao;
-    
-    public SnapshotTo getSnapshotDetailById(Long snapshotId) {
-	SnapshotTo snapshotTo = null;
+	@Autowired
+	SnapshotDetailDao snapshotDeailDao;
 
-	try {
-	    snapshotTo = snapshotDeailDao.getSnapshotDetailById(snapshotId);
-	} catch (JsonParseException e) {
-	    e.printStackTrace();
-	} catch (JsonMappingException e) {
-	    e.printStackTrace();
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
+	@Autowired
+	BrandDao brandDao;
 
-	return snapshotTo;
-    }
+	@Autowired
+	CategoryDao categoryDao;
 
-    public SnapshotTo getLatestSnapshotDetail() {
-	SnapshotTo snapshotTo = null;
+	@Autowired
+	GenderDao genderDao;
 
-	try {
-	    snapshotTo = snapshotDeailDao.getLatestSnapshotDetail();
-	} catch (JsonParseException e) {
-	    e.printStackTrace();
-	} catch (JsonMappingException e) {
-	    e.printStackTrace();
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-
-	return snapshotTo;
-    }
-
-    public SnapshotTo getSnapshotNoDetail() {
+	public SnapshotTo getSnapshotDetailById(Long snapshotId) {
 		SnapshotTo snapshotTo = null;
-	
-		snapshotTo = snapshotDeailDao.getSnapshotNoDetail();
-	
+
+		try {
+			snapshotTo = snapshotDeailDao.getSnapshotDetailById(snapshotId);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		return snapshotTo;
-    }
-    
-    public ClassificationTo getClassification() {
-    	ClassificationTo classification = new ClassificationTo();
-    	
-    	List<Brand> brands = brandDao.getBrands();
-    	for(Brand brand : brands) {
-    		classification.getBrands().put(brand.getId(), brand.getName());
-    	}
-    	
-    	List<Gender> genders = genderDao.getGenders();
-    	for(Gender gender : genders) {
-    		classification.getGenders().put(gender.getId(), gender.getName());
-    	}
-    	
-    	List<Category> categories = categoryDao.getCategories();
-    	for(Category category : categories) {
-    		classification.getCategories().put(category.getId(), category.getName());
-    	}
-    	
-    	return classification;
-    }
+	}
+
+	public SnapshotTo getLatestSnapshotDetail() {
+		SnapshotTo snapshotTo = null;
+
+		try {
+			snapshotTo = snapshotDeailDao.getLatestSnapshotDetail();
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return snapshotTo;
+	}
+
+	public SnapshotTo getSnapshotNoDetail() {
+		SnapshotTo snapshotTo = null;
+
+		snapshotTo = snapshotDeailDao.getSnapshotNoDetail();
+
+		return snapshotTo;
+	}
+
+	public ClassificationTo getClassification() {
+		ClassificationTo classification = new ClassificationTo();
+
+		List<Brand> brands = brandDao.getBrands();
+		for (Brand brand : brands) {
+			classification.getBrands().put(brand.getId(), brand.getName());
+		}
+
+		List<Gender> genders = genderDao.getGenders();
+		for (Gender gender : genders) {
+			classification.getGenders().put(gender.getId(), gender.getName());
+		}
+
+		List<Category> categories = categoryDao.getCategories();
+		for (Category category : categories) {
+			classification.getCategories().put(category.getId(), category.getName());
+		}
+
+		return classification;
+	}
 }

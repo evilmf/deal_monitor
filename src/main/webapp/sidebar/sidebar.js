@@ -2,11 +2,9 @@
 
 var sidebarModule = angular.module('myApp.sidebar', ['ui.bootstrap', 'ngCookies']);
 
-sidebarModule.controller('sidebarCtrl', ['$log', '$rootScope', 'sidebarService', function($log, $rootScope, sidebarService) {
+sidebarModule.controller('sidebarCtrl', ['$log', '$rootScope', 'sidebarService', '$cookies', function($log, $rootScope, sidebarService, $cookies) {
 	var setting = sidebarService.loadSetting();
 	
-	$log.log('Initialize sidebar setting');
-	$log.log(setting);
 	$rootScope.alert = setting['alert'];
 	$rootScope.play = setting['play'];
 	$rootScope.audio = setting['audio'];
@@ -20,15 +18,17 @@ sidebarModule.factory('sidebarService', ['$log', '$cookies', function($log, $coo
 	var loadSettingFromCookies = function() {
 		var setting = {};
 		
-		if($cookies['setting'] != undefined) {
-			setting = angular.fromJson($cookies['setting']);
+		if($cookies.get('setting') != undefined) {
+			setting = angular.fromJson($cookies.get('setting'));
 		}
 		
 		return setting;
 	};
 	
 	var setSetting = function(setting) {
-		$cookies['setting'] = angular.toJson(setting);
+		var exp = new Date();
+		exp.setDate(exp.getDate() + 365);
+		$cookies.put('setting', angular.toJson(setting), {expires: exp});
 	};
 	
 	var getSetting = function() {
@@ -80,10 +80,10 @@ sidebarModule.factory('sidebarService', ['$log', '$cookies', function($log, $coo
 			setCookiesSettingForPlay : setCookiesSettingForPlay};
 }]);
 
-sidebarModule.directive('sidebarFilterBtn', ['$log', '$modal', function($log, $modal) {
+sidebarModule.directive('sidebarFilterBtn', ['$log', '$uibModal', function($log, $uibModal) {
 	var link = function(scope, element, attr) {
 		element.on('click', function(event) {
-			$modal.open({
+			$uibModal.open({
 				templateUrl : 'filter/snapshotFilter.html',
 				windowClass : 'filter-modal-cnt',
 				backdrop : true,
@@ -96,10 +96,10 @@ sidebarModule.directive('sidebarFilterBtn', ['$log', '$modal', function($log, $m
 	return {link : link};
 }]);
 
-sidebarModule.directive('sidebarSettingBtn', ['$log', '$modal', function($log, $modal) {
+sidebarModule.directive('sidebarSettingBtn', ['$log', '$uibModal', function($log, $uibModal) {
 	var link = function(scope, element, attr) {
 		element.on('click', function(event) {
-			$modal.open({
+			$uibModal.open({
 				templateUrl : 'setting/snapshotSetting.html',
 				windowClass : 'setting-modal-cnt',
 				backdrop : true,
@@ -117,7 +117,6 @@ sidebarModule.directive('sidebarAlertBtn', ['$log', '$rootScope', 'sidebarServic
 		var e = element.find('a').find('span');
 		
 		element.ready(function() {
-			$log.log('sidebarAlertBtn ready');
 			if($rootScope.alert == undefined || $rootScope.alert) {
 				e.removeClass('glyphicon-volume-off');
 				e.addClass('glyphicon-volume-up');
@@ -153,7 +152,6 @@ sidebarModule.directive('sidebarPlayBtn', ['$log', '$rootScope', 'sidebarService
 		var e = element.find('a').find('span');
 		
 		element.ready(function() {
-			$log.log('sidebarPlayBtn ready');
 			if($rootScope.play == undefined || $rootScope.play) {
 				e.removeClass('glyphicon-play');
 				e.addClass('glyphicon-pause');

@@ -73,11 +73,11 @@ public class Product implements Serializable {
 	private long count;
 
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private List<Image> images = new ArrayList<Image>();
 
 	@OneToMany(mappedBy = "product")
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private List<SnapshotDetail> snapshotDetail = new ArrayList<SnapshotDetail>();
 
 	public Product() {

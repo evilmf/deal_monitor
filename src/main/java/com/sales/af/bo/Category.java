@@ -87,7 +87,7 @@ public class Category implements Serializable {
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 	}
-	
+
 	@PrePersist
 	void onCreate() {
 		setCreateDate(new Date());

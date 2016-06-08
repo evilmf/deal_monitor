@@ -43,6 +43,14 @@ public class GenderDaoImpl implements GenderDao {
 		return utilDao.saveOrUpdate(gender);
 	}
 	
+	@Override
+	public Gender insertGender(String genderName) {
+		Gender gender = new Gender();
+		gender.setName(genderName);
+		
+		return utilDao.saveOrUpdate(gender);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Gender> getGenders() {

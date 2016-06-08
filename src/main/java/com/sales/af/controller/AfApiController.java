@@ -21,41 +21,36 @@ import com.sales.af.to.SnapshotTo;
 @Controller
 public class AfApiController {
 
-    @Autowired
-    DealApiService dealApiService;
+	@Autowired
+	DealApiService dealApiService;
 
-    private static Logger logger = Logger.getLogger(AfApiController.class);
+	private static Logger logger = Logger.getLogger(AfApiController.class);
 
-    @RequestMapping(value = "/getSnapshot/{snapshotId}", method = RequestMethod.GET)
-    public @ResponseBody
-    SnapshotTo getSnapshot(@PathVariable Long snapshotId) {
-		logger.info(String
-			.format("Rest API Called: getSnapshot/%s", snapshotId));
-	
+	@RequestMapping(value = "/getSnapshot/{snapshotId}", method = RequestMethod.GET)
+	public @ResponseBody SnapshotTo getSnapshot(@PathVariable Long snapshotId) {
+		logger.info(String.format("Rest API Called: getSnapshot/%s", snapshotId));
+
 		return dealApiService.getSnapshotDetailById(snapshotId);
-    }
+	}
 
-    @RequestMapping(value = "/getSnapshot", method = RequestMethod.GET)
-    public @ResponseBody
-    SnapshotTo getSnapshot() {
+	@RequestMapping(value = "/getSnapshot", method = RequestMethod.GET)
+	public @ResponseBody SnapshotTo getSnapshot() {
 		logger.info("Rest API Called: getSnapshot");
-	
-		return dealApiService.getLatestSnapshotDetail();
-    }
 
-    @RequestMapping(value = "/getSnapshotNoDetail", method = RequestMethod.GET)
-    public @ResponseBody
-    SnapshotTo getLatestSnapshotWithoutDetail() {
+		return dealApiService.getLatestSnapshotDetail();
+	}
+
+	@RequestMapping(value = "/getSnapshotNoDetail", method = RequestMethod.GET)
+	public @ResponseBody SnapshotTo getLatestSnapshotWithoutDetail() {
 		logger.info("Rest API called: getSnapshotNoDetail");
-	
+
 		return dealApiService.getSnapshotNoDetail();
-    }
-    
-    @RequestMapping(value = "/getClassification", method = RequestMethod.GET)
-    public @ResponseBody
-    ClassificationTo getClassification() {
+	}
+
+	@RequestMapping(value = "/getClassification", method = RequestMethod.GET)
+	public @ResponseBody ClassificationTo getClassification() {
 		logger.info("Rest API called: getClassification");
-	
+
 		return dealApiService.getClassification();
-    }
+	}
 }

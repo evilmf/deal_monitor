@@ -300,7 +300,7 @@ body, html {
 
 .setting-modal-cnt .modal-dialog .modal-content {
 	width: 400px;
-	min-height: 350px;
+	min-height: 400px;
 	padding: 20px;
 }
 
@@ -393,3 +393,8 @@ body, html {
 .menu-btn-pointer {
 	cursor: pointer;
 }
+
+/*
+border: 1px solid #cccccc;
+    border-radius: 4px;
+*/

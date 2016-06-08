@@ -20,11 +20,10 @@ public class BrandDaoImpl implements BrandDao {
 
 	@Autowired
 	UtilDao utilDao;
-	
+
 	@Override
 	public Brand getBrandByName(String brandName) {
-		Query query = entityManager.createNamedQuery("getBrandByName",
-				Brand.class);
+		Query query = entityManager.createNamedQuery("getBrandByName", Brand.class);
 		query.setParameter("name", brandName);
 
 		@SuppressWarnings("unchecked")
@@ -36,18 +35,25 @@ public class BrandDaoImpl implements BrandDao {
 			return brands.get(0);
 		}
 	}
-	
+
 	@Override
 	public Brand insertBrand(Brand brand) {
 		return utilDao.saveOrUpdate(brand);
 	}
 	
+	@Override
+	public Brand insertBrand(String brandName) {
+		Brand brand = new Brand();
+		brand.setName(brandName);
+		
+		return utilDao.saveOrUpdate(brand);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Brand> getBrands() {
-		Query query = entityManager.createNamedQuery("getBrands", 
-				Brand.class);
-		
-		return query.getResultList();	
+		Query query = entityManager.createNamedQuery("getBrands", Brand.class);
+
+		return query.getResultList();
 	}
 }

@@ -3,12 +3,12 @@ package com.sales.af.crawler;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.sales.af.to.ProductsTo;
+import com.sales.af.to.SnapshotTo;
 
 public abstract class ProductQueue {
-	public static ConcurrentLinkedQueue<ProductsTo> productQueue = new ConcurrentLinkedQueue<ProductsTo>();
-	
-	public static ConcurrentLinkedQueue<ProductsTo> snapshotQueue = new ConcurrentLinkedQueue<ProductsTo>();
+	public static ConcurrentLinkedQueue<SnapshotTo> productQueue = new ConcurrentLinkedQueue<SnapshotTo>();
+
+	public static ConcurrentLinkedQueue<SnapshotTo> snapshotQueue = new ConcurrentLinkedQueue<SnapshotTo>();
 
 	public static ConcurrentHashMap<String, Long> existingBrand = new ConcurrentHashMap<String, Long>();
 

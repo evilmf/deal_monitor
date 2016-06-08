@@ -9,5 +9,7 @@ public interface GenderDao {
 
 	public Gender insertGender(Gender gender);
 	
+	public Gender insertGender(String genderName);
+
 	public List<Gender> getGenders();
 }

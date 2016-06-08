@@ -1,6 +1,6 @@
 'use strict';
 
-var snapshotSettingModule = angular.module('myApp.setting', ['ngCookies']);
+var snapshotSettingModule = angular.module('myApp.setting', ['ngCookies', 'ngSanitize', 'ui.select']);
 
 snapshotSettingModule.controller('snapshotSettingCtrl', ['$log', '$rootScope', 'snapshotSettingService', function($log, $rootScope, snapshotSettingService) {
 	$rootScope.setting = snapshotSettingService.loadSetting();
@@ -20,6 +20,11 @@ snapshotSettingModule.controller('snapshotSettingCtrl', ['$log', '$rootScope', '
 	$rootScope.setMaxPrice = function(maxPrice) {
 		$rootScope.setting = snapshotSettingService.setMaxPrice(maxPrice);
 	};
+	
+	$rootScope.setOrderBy = function(orderBy) {
+		$rootScope.setting = snapshotSettingService.setOrderBy(orderBy);
+	};
+	
 //	
 //	$rootScope.setAlertSound = function(alertSound) {
 //		snapshotSettingService.setAlertSound(alertSound);
@@ -29,7 +34,7 @@ snapshotSettingModule.controller('snapshotSettingCtrl', ['$log', '$rootScope', '
 //	$rootScope.selectedOption = $rootScope.setting.alertSound;
 }]);
 
-snapshotSettingModule.factory('snapshotSettingService', ['$log', '$cookies', '$http', function($log, $cookies, $http) {
+snapshotSettingModule.factory('snapshotSettingService', ['$log', '$cookies', '$http', '$rootScope', function($log, $cookies, $http, $rootScope) {
 	var getSetting = function() {
 		var setting = loadSettingFromCookies();
 		
@@ -53,6 +58,11 @@ snapshotSettingModule.factory('snapshotSettingService', ['$log', '$cookies', '$h
 			setting.maxPrice = 9999;
 		}
 		
+		if(angular.isUndefined(setting.orderBy) || !angular.isArray(setting.orderBy)) {
+			setting.orderBy = [$rootScope.orderByOption[0],
+			                   $rootScope.orderByOption[2]];
+		}
+		
 //		if(setting.alertSound == undefined) {
 //			setting.alertSound = 'beep.mp3';
 //		}
@@ -63,14 +73,14 @@ snapshotSettingModule.factory('snapshotSettingService', ['$log', '$cookies', '$h
 	var loadSettingFromCookies = function() {
 		var setting = {};
 		
-		angular.forEach($cookies, function(c, i) {
+		angular.forEach($cookies.getAll(), function(c, i) {
 			try {
 				if(isNaN(i) && i.toLowerCase() == 'setting') {
 					setting = JSON.parse(c);
 				}
 			}
 			catch(error) {
-				$log.log(error.message);
+
 			}
 		});
 				
@@ -78,7 +88,10 @@ snapshotSettingModule.factory('snapshotSettingService', ['$log', '$cookies', '$h
 	};
 	
 	var setCookiesForSetting = function(setting) {
-		$cookies['setting'] = JSON.stringify(setting);
+		//$cookies['setting'] = JSON.stringify(setting);
+		var exp = new Date();
+		exp.setDate(exp.getDate() + 365);
+		$cookies.put('setting', JSON.stringify(setting), {expires: exp});
 	};
 	
 	var loadSetting = function() {
@@ -145,6 +158,16 @@ snapshotSettingModule.factory('snapshotSettingService', ['$log', '$cookies', '$h
 		return setting;
 	};
 	
+	var setOrderBy = function(orderBy) {
+		var setting = loadSettingFromCookies();
+		
+		setting.orderBy = orderBy;
+		
+		setCookiesForSetting(setting);
+		
+		return setting;
+	};
+	
 //	var setAlertSound = function(alertSound) {
 //		var setting = loadSettingFromCookies();
 //		
@@ -161,11 +184,33 @@ snapshotSettingModule.factory('snapshotSettingService', ['$log', '$cookies', '$h
 			setMinDiscount : setMinDiscount,
 			setMaxDiscount : setMaxDiscount,
 			setMinPrice : setMinPrice,
-			setMaxPrice : setMaxPrice//,
+			setMaxPrice : setMaxPrice,
+			setOrderBy : setOrderBy
 			/*setAlertSound : setAlertSound*/}; 
 }]);
 
-
+snapshotSettingModule.filter('orderByOptionFilter', ['$log', '$rootScope', function($log, $rootScope) {
+	return function(allOptions) {
+		var filteredOptions = [];
+		var selectedOptions = $rootScope.setting.orderBy;
+		
+		for(var i = 0; i < allOptions.length; i++) {
+			var selected = false;
+			for(var j = 0; j < selectedOptions.length; j++) {
+				if(selectedOptions[j]['name'].split(':')[0].toLowerCase() == allOptions[i]['name'].split(':')[0].toLowerCase()) {
+					selected = true;
+					break;
+				}
+			}
+			
+			if(!selected) {
+				filteredOptions.push(allOptions[i]);
+			}
+		}
+		
+		return filteredOptions;
+	};
+}]);
 
 
 

@@ -42,6 +42,14 @@ public class CategoryDaoImpl implements CategoryDao {
 		return utilDao.saveOrUpdate(category);
 	}
 	
+	@Override
+	public Category insertCategory(String categoryName) {
+		Category category = new Category();
+		category.setName(categoryName);
+		
+		return utilDao.saveOrUpdate(category);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Category> getCategories() {

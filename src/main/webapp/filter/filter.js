@@ -46,7 +46,10 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 	
 	var setCookiesForCategory = function(categories) {
 		angular.forEach(categories, function(c, i) {
-			$cookies[i] = JSON.stringify(c);
+			//$cookies[i] = JSON.stringify(c);
+			var exp = new Date();
+			exp.setDate(exp.getDate() + 365);
+			$cookies.put(i, JSON.stringify(c), {expires: exp});
 		});
 	};
 	
@@ -83,7 +86,7 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 	var loadCategoryFromCookies = function() {
 		var brands = {};
 		
-		angular.forEach($cookies, function(c, i) {
+		angular.forEach($cookies.getAll(), function(c, i) {
 			try {
 				if(brands == null) {
 					brands = {};
@@ -98,7 +101,7 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 				}
 			}
 			catch(error) {
-				$log.log(error.message);
+
 			}
 		});
 		
