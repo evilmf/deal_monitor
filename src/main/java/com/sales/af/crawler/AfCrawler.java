@@ -14,10 +14,6 @@ import java.util.concurrent.Semaphore;
 
 import com.sales.af.bo.Category;
 import com.sales.af.bo.Gender;
-import com.sales.af.bo.Image;
-import com.sales.af.bo.Product;
-import com.sales.af.bo.SnapshotDetail;
-import com.sales.af.to.ProductsTo;
 import com.sales.af.to.SnapshotDetailTo;
 import com.sales.af.to.SnapshotTo;
 import com.sales.af.util.Util;
@@ -27,7 +23,7 @@ public class AfCrawler extends ProductQueue {
 
 	private static final int size = 1;
 	private static Semaphore isRunnable = new Semaphore(size);
-	private static final String brandName = "Abercrombie & Fitch";
+	private static final String brandNameAF = "Abercrombie & Fitch";
 
 	private SnapshotTo allProducts;
 
@@ -53,7 +49,7 @@ public class AfCrawler extends ProductQueue {
 			if (!allProducts.getSnapshotDetail().isEmpty()) {
 				logger.info(String.format("Enqueuing Brand: %s; Products Found: %s",
 						//allProducts.getBrandName(),
-						brandName.toLowerCase(),
+						brandNameAF.toLowerCase(),
 						allProducts.getSnapshotDetail().size()));
 
 				productQueue.add(allProducts);
@@ -75,11 +71,9 @@ public class AfCrawler extends ProductQueue {
 	}
 
 	private void getProducts() throws IOException {
-		GenderInfoList genderUrls = new GenderInfoList();
-		genderUrls = getGenderUrls();
+		GenderInfoList genderUrls = getGenderUrls();
 
-		CategoryInfoList categoryUrls = new CategoryInfoList();
-		categoryUrls = getCategoryUrls(genderUrls);
+		CategoryInfoList categoryUrls = getCategoryUrls(genderUrls);
 
 		for (CategoryInfo ci : categoryUrls) {
 			try {
@@ -126,7 +120,7 @@ public class AfCrawler extends ProductQueue {
 						snapshotDetailTo.setGenderName(ci.gender.getName());
 						snapshotDetailTo.setProductUrl(productUrl);
 						snapshotDetailTo.setProductDataId(dataProductId);
-						snapshotDetailTo.setBrandName(brandName.toLowerCase());
+						snapshotDetailTo.setBrandName(brandNameAF.toLowerCase());
 						
 						allProducts.getSnapshotDetail().put(Long.parseLong(dataProductId), snapshotDetailTo);
 						
@@ -220,23 +214,24 @@ public class AfCrawler extends ProductQueue {
 
 		return categoryUrls;
 	}
-}
 
-class GenderInfo {
-	public String url;
-	public Gender gender;
-}
 
-class CategoryInfo {
-	public String url;
-	public Category category;
-	public Gender gender;
-}
-
-class GenderInfoList extends ArrayList<GenderInfo> {
-	private static final long serialVersionUID = 8327499788787399644L;
-}
-
-class CategoryInfoList extends ArrayList<CategoryInfo> {
-	private static final long serialVersionUID = 4568037474241286411L;
+	class GenderInfo {
+		public String url;
+		public Gender gender;
+	}
+	
+	class CategoryInfo {
+		public String url;
+		public Category category;
+		public Gender gender;
+	}
+	
+	class GenderInfoList extends ArrayList<GenderInfo> {
+		private static final long serialVersionUID = 8327499788787399644L;
+	}
+	
+	class CategoryInfoList extends ArrayList<CategoryInfo> {
+		private static final long serialVersionUID = 4568037474241286411L;
+	}
 }

@@ -21,7 +21,7 @@
 
 	<!-- Activates various annotations to be detected in bean classes -->
 	<context:annotation-config />
-	
+
 	<mvc:default-servlet-handler />
 
 	<context:property-placeholder
@@ -57,12 +57,14 @@
 				<value>queries/AF.xml</value>
 			</list>
 		</property>
-		<property name="jpaPropertyMap">  
-           <map>
-	           <entry key="hibernate.query.plan_cache_max_strong_references" value="32"/>
-	           <entry key="hibernate.query.plan_cache_max_soft_references" value="32"/>
-	       </map>
-   		</property>
+		<property name="jpaPropertyMap">
+			<map>
+				<entry key="hibernate.query.plan_cache_max_strong_references"
+					value="32" />
+				<entry key="hibernate.query.plan_cache_max_soft_references"
+					value="32" />
+			</map>
+		</property>
 		<property name="dataSource" ref="tomcatDataSource" />
 		<property name="jpaVendorAdapter">
 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
@@ -80,14 +82,19 @@
 		proxy-target-class="true" />
 
 	<bean id="jacksonObjectMapper" class="org.codehaus.jackson.map.ObjectMapper"></bean>
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate"></bean>
 
 	<bean id="afCrawler" class="com.sales.af.crawler.AfCrawler"></bean>
+	<bean id="hollisterCrawler" class="com.sales.af.crawler.HollisterCrawler"></bean>
 	<bean id="dataLoader" class="com.sales.af.crawler.DataLoader"></bean>
 	<bean id="snapshotLoader" class="com.sales.af.crawler.SnapshotLoader"></bean>
+
 
 	<task:annotation-driven />
 	<task:scheduled-tasks>
 		<task:scheduled ref="afCrawler" method="crawl"
+			fixed-delay="90000" initial-delay="1000" />
+		<task:scheduled ref="hollisterCrawler" method="crawl"
 			fixed-delay="90000" initial-delay="1000" />
 		<task:scheduled ref="dataLoader" method="load"
 			fixed-delay="5000" initial-delay="1000" />

@@ -50,7 +50,7 @@ public class DataLoader extends ProductQueue {
 			long startTime = System.currentTimeMillis();
 			setBrandInfo(allProducts);
 			logger.info(String.format("Start Loading Products for Brand: %s; Queue Size: %s",
-					allProducts.getBrandId(), productQueue.size()));
+					brandName, productQueue.size()));
 
 			loadBrand();
 			loadGender();
@@ -67,7 +67,7 @@ public class DataLoader extends ProductQueue {
 
 	private void loadBrand() {
 		if (existingBrand.containsKey(brandName)) {
-			logger.debug(String.format("Brand %s exists in memory.", brandName));
+			logger.info(String.format("Brand %s exists in memory.", brandName));
 			allProducts.setBrandId(existingBrand.get(brandName)); 
 
 		} else {
@@ -83,7 +83,7 @@ public class DataLoader extends ProductQueue {
 			
 			allProducts.setBrandId(brand.getId());
 			existingBrand.put(brandName, allProducts.getBrandId());
-			logger.debug(String.format("Brand %s has id %s", brandName, allProducts.getBrandId()));
+			logger.info(String.format("Brand %s has id %s", brandName, allProducts.getBrandId()));
 		}
 	}
 
@@ -210,6 +210,7 @@ public class DataLoader extends ProductQueue {
 		genderNames = new HashSet<String>();
 		categoryNames = new HashSet<String>();
 		productDataIds = new HashSet<String>();
+		brandName = null;
 		for(SnapshotDetailTo snapshotDetailTo : snapshotTo.getSnapshotDetail().values()) {
 			if (brandName == null) { 
 				brandName = snapshotDetailTo.getBrandName().toLowerCase();
