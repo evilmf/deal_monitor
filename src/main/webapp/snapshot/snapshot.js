@@ -176,12 +176,13 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 		filteredProducts['existing'] = orderFilter(filteredProducts['existing']);
 		filteredProducts['percentOff'] = function() { return Math.round(this.discount * 100); };
 		filteredProducts['ebaySearchKeyword'] = function() { return encodeURIComponent(this.productName + ' ' + this.brandName); };
+		filteredProducts['parsedImageUrl'] = function() { if(angular.equals(this.brandName, 'abercrombie & fitch') || angular.equals(this.brandName, 'hollister')) { return this.images[0] + '?$product-anf-v1$&$category-anf-v1$&wid=206&hei=206';} else { return this.images[0]; } };
 		
 		var tpl = '{{#new}}' 
 			+ '<div class="prod-cnt pull-left">'
 			+ '<div class="prod-img-cnt">'
 			+ '<span class="new">NEW</span>'
-			+ '<a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
+			+ '<a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{parsedImageUrl}}" /></a></div>'
 			+ '<div class="prod-brand"><span>{{brandName}}</span></div>'
 			+ '<div class="prod-name"><a href="#">{{productName}}</a></div>'
 			+ '<div class="prod-price"><a target=_blank href="http://www.ebay.com/sch/i.html?_nkw={{ebaySearchKeyword}}">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
@@ -192,7 +193,7 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 			+ '{{#existing}}' 
 			+ '<div class="prod-cnt pull-left">'
 			+ '<div class="prod-img-cnt">'
-			+ '<a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{images.0}}" /></a></div>'
+			+ '<a target="_blank" href="{{productUrl}}"><img class="prod-img" src="{{parsedImageUrl}}" /></a></div>'
 			+ '<div class="prod-brand"><span>{{brandName}}</span></div>'
 			+ '<div class="prod-name"><a href="#">{{productName}}</a></div>'
 			+ '<div class="prod-price"><a target=_blank href="http://www.ebay.com/sch/i.html?_nkw={{ebaySearchKeyword}}">${{priceDiscount}} - ${{priceRegular}}</a><div class="prod-cat"><a href="#">{{categoryName}}</a></div></div>'
