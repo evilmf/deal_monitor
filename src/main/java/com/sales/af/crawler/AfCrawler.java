@@ -163,7 +163,7 @@ public class AfCrawler extends ProductQueue {
 	private GenderInfoList getGenderUrls() throws IOException {
 		GenderInfoList genderUrls = new GenderInfoList();
 		Document doc = Util.getConnWithUserAgent(afHomePage).get();
-		Elements genderElements = doc.select("a[id*=division][href*=/mens], [id*=division][href*=/womens]");
+		Elements genderElements = doc.select("a[href*=/mens][title=Mens], [href*=/womens][title=Womens]");
 		for (Element g : genderElements) {
 			Gender gender = new Gender();
 			String genderName = g.text().toLowerCase();
@@ -187,10 +187,11 @@ public class AfCrawler extends ProductQueue {
 
 		for (GenderInfo genderUrl : genderUrls) {
 			Document docCate = Util.getConnWithUserAgent(genderUrl.url).get();
-			Elements discounts = docCate.select("ul.primary li a[href*=sale], a[href*=clearance], a[href*=secret]");
+			Elements discounts = docCate.select("ul.primary li a[href*=sale], a[href*=clearance], a[href*=secret]").not("[class]");
+			//, a[href*=special-offers]
 			for (Element d : discounts) {
 				Document docDiscount = Util.getConnWithUserAgent(d.absUrl("href")).get();
-				Elements categoryElements = docDiscount.select("ul.secondary li");
+				Elements categoryElements = docDiscount.select("li.current.selected ul.secondary li");
 				for (Element e : categoryElements) {
 					if (e.select("ul.tertiary").size() > 0) {
 						continue;
