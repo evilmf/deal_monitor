@@ -5,6 +5,7 @@ var menuModule = angular.module('myApp.menu', ['ui.bootstrap']);
 menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$rootScope', function(snapshotService, menuService, $log, $rootScope) {
 	$rootScope.showSidebar = false;
 	$rootScope.pageCntStyle = {'padding-left': '10px'};
+	$rootScope.searchResult;
 	
 	$rootScope.nextSnapshot = function() {
 		$rootScope.currentSnapshotId = menuService.getNextSnapshotId($rootScope.currentSnapshotId, $rootScope.latestSnapshotId);
@@ -21,6 +22,17 @@ menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$r
 	$rootScope.getSnapshotById = function(id) {
 		if(id > 0) {
 			$rootScope.currentSnapshotId = id;
+		}
+	};
+	
+	$rootScope.getSearchResult = function(keyword) {
+		if(keyword.trim().length >= 3 ) {
+			menuService.getSearchResult(keyword).success(function(res) {
+				$rootScope.searchResult = res;
+			});
+		}
+		else {
+			$rootScope.searchResult = undefined;
 		}
 	};
 	
@@ -67,7 +79,7 @@ menuModule.directive('sidebarCtrlBtn', ['$log', '$rootScope', function($log, $ro
 	return {link : link};
 }]);
 
-menuModule.factory('menuService', ['$log', function($log){
+menuModule.factory('menuService', ['$http', '$log', function($http, $log){
 	var getNextSnapshotId = function(c, l) {
 		c = parseInt(c);
 		var s = c;
@@ -88,6 +100,68 @@ menuModule.factory('menuService', ['$log', function($log){
 		return s;
 	};
 	
+	var getSearchResult = function(keyword) {
+		var url = '/search';
+		return $http.post(url, {'searchKeyword': keyword});
+	}; 
+	
+	var getSearchContent = function(searchResult) {
+		var content = {};
+		content['searchResult'] = searchResult;
+		content['parsedImageUrl'] = function() { if(angular.equals(this.brandName, 'abercrombie & fitch') || angular.equals(this.brandName, 'hollister')) { return this.imageUrl + '?$product-anf-v1$&$category-anf-v1$&wid=94&hei=94';} else { return this.imageUrl; } };
+		
+		var tpl = '{{#searchResult}}<div class="search-result-cell pull-left">'
+			+ '<div class="cell-img-cnt pull-left">'
+			+ '<img class="cell-img" src="{{parsedImageUrl}}" />'
+			+ '</div>'
+			+ '<div class="cell-info pull-left">'
+			+ '<div class="search-prod-name"><span>{{productName}}</span></div>'
+			+ '<div class="search-prod-brand"><span class="span-block pull-left">{{brandName}}</span><span>{{genderName}}</span></div>'
+			+ '<div class="search-prod-category"><span>{{categoryName}}</span></div>'
+			+ '<div class="search-prod-price"><span class="span-block pull-left">${{minPrice}} - ${{maxPrice}}</span><span># of Snapshots: {{snapshotCount}}</span></div>'
+			+ '</div>'
+			+ '<div style="clear: both;"></div>'
+			+ '<div class="bottom-border"></div>'				
+			+ '</div>{{/searchResult}}';
+		
+		return searchResult == undefined ? '' : Mustache.render(tpl, content);
+	};
+	
 	return {getNextSnapshotId : getNextSnapshotId,
-			getPreSnapshotId : getPreSnapshotId};
+			getPreSnapshotId : getPreSnapshotId,
+			getSearchResult : getSearchResult,
+			getSearchContent : getSearchContent};
 }]);
+
+menuModule.directive('searchDetail', ['$rootScope', '$log', 'menuService', 
+                                      function($rootScope, $log, menuService) {
+	return {
+		restrict: 'E',
+		link: function(scope, element, attrs) {
+			$rootScope.$watch('searchResult', function(o, n) {
+				var content = menuService.getSearchContent($rootScope.searchResult);
+				element.html(content);
+			}, true);
+		}
+	};
+	
+}]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

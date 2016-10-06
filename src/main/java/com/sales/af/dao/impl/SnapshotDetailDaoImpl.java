@@ -192,4 +192,11 @@ public class SnapshotDetailDaoImpl implements SnapshotDetailDao {
 
 		return snapshotTo;
 	}
+	
+	public Object[] getSnapshotListByProductId(Long productId) {
+		Query query = entityManager.createNamedQuery("getSnapshotListByProductId");
+		query.setParameter("product_id", productId);
+		
+		return query.getResultList().toArray();
+	}
 }

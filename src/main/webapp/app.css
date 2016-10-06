@@ -2,7 +2,7 @@
 
 body, html {
   height: 100%;
-  min-width: 600px;
+  min-width: 760px;
   width: 100%;
   text-transform: capitalize;
 }
@@ -37,6 +37,15 @@ body, html {
 
 .main-container {
     height: 100%;
+}
+
+.search-content {
+    padding-top: 60px;
+    margin-bottom: -60px;
+    width: 100%;
+    max-height: 25%;
+    z-index: 10;
+    padding-left: 50px;
 }
 
 .page-content {
@@ -86,7 +95,7 @@ body, html {
 }
 
 .nav-left {
-    width: 650px;
+    width: 770px;
 }
 
 .separator {
@@ -392,6 +401,90 @@ body, html {
 
 .menu-btn-pointer {
 	cursor: pointer;
+}
+
+.timestamp {
+	padding-left: 9px;
+	font-size: 16px;
+  font-style: italic;
+  margin-top: 3px;
+  display: block;
+  color: grey;
+  width: 160px;
+}
+
+.search-result-cell {
+	width: 465px;
+	height: 100px;
+	/*border-bottom: 1px solid grey;
+	border-radius: 4px;*/
+	margin: 0 5px 10px 0;
+}
+
+.search-cnt {
+	padding: 1px 0 0 5px;
+	/*height: 300px;
+	overflow: scroll;*/
+}
+
+.cell-img-cnt {
+	height: 94px;
+	margin: 3px 0 3px 4px;
+	width: 94px;
+}
+
+.cell-info {
+	height: 88px;
+	margin: 6px 0 3px 10px;
+	width: 357px;
+	padding-left: 10px;
+	border-left: 1px solid grey;
+	border-right: 1px solid grey;
+}
+
+.cell-img {
+	width: 94px;
+	height: 94px;
+}
+
+.search-prod-name {
+	font-size: 16px;
+  color: #085F99;
+  font-weight: 600;
+  line-height: 18px;
+  padding-top: 2px;
+  height: 18px;
+  overflow: hidden;
+}
+
+.search-prod-brand {
+	font-size: 14px;
+  font-weight: 500;
+  color: #828282;
+  line-height: 23px;
+}
+
+.search-prod-category {
+	font-size: 14px;
+	color: #BF2E73;
+	line-height: 23px;
+}
+
+.search-prod-price {
+	font-size: 14px;
+	color: #60a430;
+	line-height: 23px;
+}
+
+.span-block {
+	display: block;
+	width: 180px;
+}
+
+.bottom-border {
+	border-bottom: 1px solid grey; 
+	margin: 0 5px 0 5px; 
+	width: 450px;
 }
 
 /*

@@ -90,7 +90,7 @@
 	<bean id="snapshotLoader" class="com.sales.af.crawler.SnapshotLoader"></bean>
 
 
-	<task:annotation-driven />
+	<!--task:annotation-driven />
 	<task:scheduled-tasks>
 		<task:scheduled ref="afCrawler" method="crawl"
 			fixed-delay="90000" initial-delay="1000" />
@@ -100,7 +100,7 @@
 			fixed-delay="5000" initial-delay="1000" />
 		<task:scheduled ref="snapshotLoader" method="load"
 			fixed-delay="2000" initial-delay="1000" />
-	</task:scheduled-tasks>
+	</task:scheduled-tasks-->
 
 </beans>
 

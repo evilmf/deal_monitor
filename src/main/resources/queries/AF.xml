@@ -88,4 +88,67 @@
 						left join images i on i.product_id = p.id
 						order by sd.id desc]]></query>
 	</named-native-query>
+	
+	<named-native-query name="searchProductByName">
+		<query><![CDATA[select distinct
+						p.id, 
+						p.name product_name, 
+						b.name brand_name, 
+						g.name gender_name, 
+						c.name category_name, 
+						i.url image_url,
+						min(sd.price_discount) over (partition by p.id) min_price,
+						max(sd.price_discount) over (partition by p.id) max_price, 
+						count(p.id) over (partition by p.id) count,
+						ts_rank(name_tsvector, plainto_tsquery('english', ?)) ts_rank
+						from products p 
+						join snapshot_detail sd on sd.product_id = p.id
+						join brands b on b.id = p.brand_id
+						join categories c on c.id = p.category_id
+						join images i on i.product_id = p.id
+						join genders g on g.id = p.gender_id
+						where name_tsvector @@ to_tsquery('english', ?) 
+						and sd.is_active = true]]></query>
+	</named-native-query>
+	
+	<named-native-query name="getSnapshotListByProductId">
+		<query><![CDATA[with active_snapshot as (
+											select 
+											sd.*,
+											row_number() over (partition by product_id order by create_date) rank
+											from snapshot_detail sd
+											where sd.product_id = :product_id
+											and sd.is_active = true
+										),
+										inactive_snapshot as (
+											select 
+											sd.*,
+											row_number() over (partition by product_id order by create_date) rank
+											from snapshot_detail sd
+											where sd.product_id = :product_id
+											and sd.is_active = false
+										)
+										select
+										ass.snapshot_id,
+										ass.product_id,
+										p.name,
+										b.id brand_id,
+										b.name brand_name,
+										g.id gender_id,
+										g.name gender_name,
+										c.id category_id,
+										c.name category_name,
+										ass.price_discount price,
+										ass.create_date active_date,
+										iss.create_date inactive_date,
+										EXTRACT(EPOCH FROM iss.create_date - ass.create_date) duration
+										from active_snapshot ass
+										left join inactive_snapshot iss on iss.rank = ass.rank
+										join products p on p.id = ass.product_id
+										join brands b on b.id = p.brand_id
+										join genders g on g.id = p.gender_id
+										join categories c on c.id = p.category_id 
+										order by snapshot_id
+		]]></query>
+	</named-native-query>
 </entity-mappings>

@@ -30,4 +30,6 @@ public interface SnapshotDetailDao {
 	public SnapshotTo getLatestSnapshotDetail() throws JsonParseException, JsonMappingException, IOException;
 
 	public SnapshotTo getSnapshotNoDetail();
+	
+	public Object[] getSnapshotListByProductId(Long productId);
 }

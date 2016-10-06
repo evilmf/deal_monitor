@@ -56,11 +56,14 @@
 					</li>
 					<li class="quick-link-2"><span class="separator"></span></li>
 					<li class="quick-link-2"><span
-							class="glyphicon glyphicon-search disabled" aria-hidden="true"></span>
+							class="glyphicon glyphicon-search" aria-hidden="true"></span>
 					</li>
 					<li class="quick-link-2"><input type="text"
-						class="form-control search-input disabled" aria-describedby="basic-addon2"
-						placeholder="Search Products" disabled></li>
+						class="form-control search-input" aria-describedby="basic-addon2"
+						placeholder="Search Products"
+						ng-model="$root.searchKeyword"
+						ng-change="getSearchResult(searchKeyword)"></li>
+					<li class="quick-link-2"><span class="timestamp">{{snapshotTimestamp | date:'yyyy-MM-dd HH:mm:ss'}}</span></li>
 					<li class="quick-link-2"><div class="loading-cnt"><span us-spinner="{{spinOpts}}" spinner-key="loading"></span></div></li>
 				</ul>
 			</div>
@@ -82,6 +85,25 @@
 				<li sidebar-alert-btn><a href><span class="glyphicon glyphicon-volume-up" ng-attr-volume="on"
 						aria-hidden="true"></span> </a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li>	
 			</ul>
+		</div>
+		<div class="search-content" ng-style="$root.pageCntStyle" ng-show="true">
+			<div class="search-cnt">
+				<search-detail>
+					<!--div class="search-result-cell pull-left">
+						<div class="cell-img-cnt pull-left">
+							<img class="cell-img" src="http://anf.scene7.com/is/image/anf/anf_83248_01_prod1?$product-anf-v1$&amp;$category-anf-v1$&amp;wid=94&amp;hei=94" />
+						</div>
+						<div class="cell-info pull-left">
+							<div class="search-prod-name"><span>Full-Zip Track Jacket</span></div>
+							<div class="search-prod-brand"><span class="span-block pull-left">abercrombie &amp; fitch</span><span>Mens</span></div>
+							<div class="search-prod-category"><span>outerwear &amp; jackets</span></div>
+							<div class="search-prod-price"><span class="span-block pull-left">$18 - $60</span><span># of Snapshots: 122</span></div>
+						</div>
+						<div style="clear: both;"></div>
+						<div class="bottom-border"></div>					
+					</div-->
+				</search-detail>
+			</div>
 		</div>
 		<div ng-view class="page-content" ng-style="$root.pageCntStyle"></div>
 	</div>

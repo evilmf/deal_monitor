@@ -1,5 +1,6 @@
 package com.sales.af.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
@@ -30,5 +31,21 @@ public class Util {
 		Matcher m = pricePattern.matcher(price.trim().replace("$", ""));
 		m.find();
 		return Float.parseFloat(m.group(0));
+	}
+	
+	public static String escapeForSearch(String keyword) {
+		return keyword.replace("*", "\\*")
+				.replace(":", "\\:")
+				.replace("&", "\\&")
+				.replaceAll("\\s+", " ")
+				.trim();
+	}
+	
+	public static String parsedSearchKeyword(String keyword) {
+		String[] words = escapeForSearch(keyword).split(" ");
+		for(int i = 0; i < words.length; i++) {
+			words[i] = words[i] + ":*";
+		}
+		return StringUtils.join(words, " & ");
 	}
 }
