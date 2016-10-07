@@ -75,9 +75,9 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 			productSnapshot.setSnapshotId(Long.parseLong(data[0].toString()));
 			productSnapshot.setProductId(Long.parseLong(data[1].toString()));
 			productSnapshot.setPrice(Float.parseFloat(data[9].toString()));
-			productSnapshot.setActiveDate(new Date(((Timestamp) data[10]).getTime()));
-			productSnapshot.setInactiveDate(new Date(((Timestamp) data[11]).getTime()));
-			productSnapshot.setDuration(Float.parseFloat((data[12].toString())));
+			productSnapshot.setActiveDate((Timestamp) data[10]);
+			productSnapshot.setInactiveDate((Timestamp) data[11]);
+			productSnapshot.setDuration(data[12] != null ? Float.parseFloat((data[12].toString())) : null);
 			
 			productSnapshots.setProductName(data[2].toString());
 			productSnapshots.setBrandId(Long.parseLong(data[3].toString()));

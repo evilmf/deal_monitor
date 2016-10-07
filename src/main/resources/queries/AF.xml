@@ -100,14 +100,14 @@
 						min(sd.price_discount) over (partition by p.id) min_price,
 						max(sd.price_discount) over (partition by p.id) max_price, 
 						count(p.id) over (partition by p.id) count,
-						ts_rank(name_tsvector, plainto_tsquery('english', ?)) ts_rank
+						ts_rank(name_tsvector, plainto_tsquery('simple', ?)) ts_rank
 						from products p 
 						join snapshot_detail sd on sd.product_id = p.id
 						join brands b on b.id = p.brand_id
 						join categories c on c.id = p.category_id
 						join images i on i.product_id = p.id
 						join genders g on g.id = p.gender_id
-						where name_tsvector @@ to_tsquery('english', ?) 
+						where name_tsvector @@ to_tsquery('simple', ?) 
 						and sd.is_active = true]]></query>
 	</named-native-query>
 	

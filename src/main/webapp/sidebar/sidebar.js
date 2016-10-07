@@ -160,7 +160,6 @@ sidebarModule.directive('sidebarPlayBtn', ['$log', '$rootScope', 'sidebarService
 				e.removeClass('glyphicon-pause');
 				e.addClass('glyphicon-play');
 			}
-			
 		});
 		
 		element.on('click', function(event) {

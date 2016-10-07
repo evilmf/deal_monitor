@@ -79,7 +79,7 @@ menuModule.directive('sidebarCtrlBtn', ['$log', '$rootScope', function($log, $ro
 	return {link : link};
 }]);
 
-menuModule.factory('menuService', ['$http', '$log', function($http, $log){
+menuModule.factory('menuService', ['$http', '$log', '$filter', 'durationFilter', function($http, $log, $filter, durationFilter){
 	var getNextSnapshotId = function(c, l) {
 		c = parseInt(c);
 		var s = c;
@@ -105,12 +105,17 @@ menuModule.factory('menuService', ['$http', '$log', function($http, $log){
 		return $http.post(url, {'searchKeyword': keyword});
 	}; 
 	
+	var getProductSnapshots = function(productId) {
+		var url = '/productSnapshots/' + productId;
+		return $http.get(url);
+	}; 
+	
 	var getSearchContent = function(searchResult) {
 		var content = {};
 		content['searchResult'] = searchResult;
 		content['parsedImageUrl'] = function() { if(angular.equals(this.brandName, 'abercrombie & fitch') || angular.equals(this.brandName, 'hollister')) { return this.imageUrl + '?$product-anf-v1$&$category-anf-v1$&wid=94&hei=94';} else { return this.imageUrl; } };
 		
-		var tpl = '{{#searchResult}}<div class="search-result-cell pull-left">'
+		var tpl = '{{#searchResult}}<div list-product-snapshot productId="{{productId}}" class="search-result-cell pull-left">'
 			+ '<div class="cell-img-cnt pull-left">'
 			+ '<img class="cell-img" src="{{parsedImageUrl}}" />'
 			+ '</div>'
@@ -122,32 +127,117 @@ menuModule.factory('menuService', ['$http', '$log', function($http, $log){
 			+ '</div>'
 			+ '<div style="clear: both;"></div>'
 			+ '<div class="bottom-border"></div>'				
-			+ '</div>{{/searchResult}}';
+			+ '</div><{{/searchResult}}';
 		
 		return searchResult == undefined ? '' : Mustache.render(tpl, content);
+	};
+	
+	var getProductSnapshotContent = function(productSnapshots) {
+		productSnapshots['activeDateFormatted'] = function() { return $filter('date')(this.activeDate, 'yyyy-MM-dd HH:mm:ss'); };
+		productSnapshots['inactiveDateFormatted'] = function() { return $filter('date')(this.inactiveDate, 'yyyy-MM-dd HH:mm:ss'); };
+		productSnapshots['durationFormatted'] = function() { return durationFilter(this.duration); };
+		
+		var tpl = '<table class="table table-hover">'
+			+ '<thead><tr>'
+			+ '<th>Snapshot</th>'
+			+ '<th>Price</th>'
+			+ '<th>Active Time</th>'
+			+ '<th>Inactive Time</th>'
+			+ '<th>Duration</th>'
+			+ '</tr></thead><tbody>'
+			+ '{{#productSnapshotList}}<tr>'
+			+ '<th scope="row">{{snapshotId}}</th>'
+			+ '<td>${{price}}</td>'
+			+ '<td>{{activeDateFormatted}}</td>'
+			+ '<td>{{inactiveDateFormatted}}</td>'
+			+ '<td>{{durationFormatted}}</td>'
+			+ '</tr>{{/productSnapshotList}}'
+			+ '</tbody></table>';
+		
+		return productSnapshots == undefined ? undefined : Mustache.render(tpl, productSnapshots);
 	};
 	
 	return {getNextSnapshotId : getNextSnapshotId,
 			getPreSnapshotId : getPreSnapshotId,
 			getSearchResult : getSearchResult,
-			getSearchContent : getSearchContent};
+			getSearchContent : getSearchContent,
+			getProductSnapshots : getProductSnapshots,
+			getProductSnapshotContent : getProductSnapshotContent};
 }]);
 
-menuModule.directive('searchDetail', ['$rootScope', '$log', 'menuService', 
-                                      function($rootScope, $log, menuService) {
+menuModule.directive('searchDetail', ['$rootScope', '$log', '$compile', 'menuService',
+                                      function($rootScope, $log, $compile, menuService) {
 	return {
 		restrict: 'E',
 		link: function(scope, element, attrs) {
 			$rootScope.$watch('searchResult', function(o, n) {
 				var content = menuService.getSearchContent($rootScope.searchResult);
 				element.html(content);
+				$compile(element.contents())(scope);
 			}, true);
 		}
 	};
 	
 }]);
 
+menuModule.directive('listProductSnapshot', ['$rootScope', '$log', '$compile', '$uibModal', 'menuService',
+                                     function($rootScope, $log, $compile, $uibModal, menuService) {
+	var link = function(scope, element, attr) {
+		element.on('click', function(event) {
+			$log.log(attr.productid);
+			
+			menuService.getProductSnapshots(attr.productid).success(function(res) {
+				var content = menuService.getProductSnapshotContent(res);
+				
+				if(content != undefined) { 
+					$uibModal.open({
+						template : content,
+						windowClass : 'product-snapshot-list-modal',
+						backdrop : true,
+						backdropClass : 'filter-backdrop-fade'//,
+						//controller: 'snapshotFilterCtrl'
+					});
+				}
+			});
+			
+		});
+	};
+	
+	return {restrict: 'A', link : link};
+}]);
 
+menuModule.filter('duration', ['$log', function($log){
+	return function(duration) {
+		var durationString = '';
+		
+		duration = Math.round(duration);
+		
+		var day = Math.floor(duration / (60 * 60 * 24));
+		duration = duration % (60 * 60 * 24);
+		var hour = Math.floor(duration / (60 * 60));
+		duration = duration % (60 * 60);
+		var min = Math.floor(duration / 60);
+		var sec = Math.floor(duration % 60);
+		
+		if(day > 0) {
+			durationString = durationString + day + (day == 1 ? ' day ' : ' days '); 
+		} 
+		
+		if(hour > 0) {
+			durationString = durationString + hour + (hour == 1 ? ' hour ' : ' hours ');
+		}
+		
+		if(min > 0) {
+			durationString = durationString + min + (min == 1 ? ' min ' : ' mins ');
+		} 
+		
+		if(sec > 0) {
+			durationString = durationString + sec + (sec == 1 ? ' sec' : ' secs');
+		}
+		
+		return durationString;
+	};
+}]);
 
 
 
