@@ -247,14 +247,14 @@ menuModule.filter('duration', ['$log', function($log){
 menuModule.controller('productSnapshotModalCtrl', ['$log', '$rootScope', function($log, $rootScope) {	
 	$rootScope.setSnapshotId = function(id) {
 		$rootScope.currentSnapshotId = id;
-		$rootScope.showSearchResult = false;
+		//$rootScope.showSearchResult = false;
 	};
 }]);
 
 menuModule.controller('dropdownCtrl', ['$log', '$rootScope', function($log, $rootScope) {
 	$rootScope.hideSearchResult = function() {
 		$rootScope.showSearchResult = false;
-		$log.log('Hide search result.');
+		//$log.log('Hide search result.');
 	};
 }]);
 

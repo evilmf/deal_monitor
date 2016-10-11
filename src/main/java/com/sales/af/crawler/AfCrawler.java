@@ -29,6 +29,9 @@ public class AfCrawler extends ProductQueue {
 
 	@Value("${afHomePage}")
 	private String afHomePage;
+	
+	@Value("${minDiscount}")
+	private Float minDiscount;
 
 	public void crawl() throws InterruptedException, IOException {
 		long startTime = System.currentTimeMillis();
@@ -41,24 +44,18 @@ public class AfCrawler extends ProductQueue {
 
 		allProducts = new SnapshotTo();
 		allProducts.setSnapshotDetail(new HashMap<Long, SnapshotDetailTo>()); 
-		//allProducts.setBrandName(brandName.toLowerCase());
 
 		try {
 			getProducts();
 
 			if (!allProducts.getSnapshotDetail().isEmpty()) {
 				logger.info(String.format("Enqueuing Brand: %s; Products Found: %s",
-						//allProducts.getBrandName(),
 						brandNameAF.toLowerCase(),
 						allProducts.getSnapshotDetail().size()));
 
 				productQueue.add(allProducts);
 			} 
-//			else {
-//				logger.info(String.format("%s gender found", allProducts.getGenders().size()));
-//				logger.info(String.format("%s category found", allProducts.getCategories().size()));
-//				logger.warn(String.format("No product found for brand %s", allProducts.getBrand().getName()));
-//			}
+
 		} catch (Exception e) {
 			logger.error("Got exception while crawling", e);
 		} finally {
@@ -80,9 +77,7 @@ public class AfCrawler extends ProductQueue {
 				Document docProduct = Util.getConnWithUserAgent(ci.url).get();
 				Elements productElements = docProduct
 						.select("ul.category-product-wrap.whiteoutarea li.product-wrap>div");
-				// logger.info(String.format("Category %s - %s",
-				// ci.category.getName(),
-				// ci.url));
+
 				for (Element p : productElements) {
 					try {
 						String dataProductId = p.attr("data-productid");
@@ -108,6 +103,11 @@ public class AfCrawler extends ProductQueue {
 							continue;
 						}
 						
+						float discount = (listPrice - offerPrice) / listPrice;
+						if(discount <= minDiscount) {
+							continue;
+						}
+						
 						SnapshotDetailTo snapshotDetailTo = new SnapshotDetailTo();
 						List<String> images = new ArrayList<String>();
 						images.add(imageUrl);
@@ -123,30 +123,7 @@ public class AfCrawler extends ProductQueue {
 						snapshotDetailTo.setBrandName(brandNameAF.toLowerCase());
 						
 						allProducts.getSnapshotDetail().put(Long.parseLong(dataProductId), snapshotDetailTo);
-						
-//						Product product = new Product();
-//						List<Image> images = new ArrayList<Image>();
-//						List<SnapshotDetail> snapshots = new ArrayList<SnapshotDetail>();
-//
-//						Image image = new Image();
-//						image.setImageUrl(imageUrl);
-//						images.add(image);
-//
-//						SnapshotDetail snapshot = new SnapshotDetail();
-//						snapshot.setPriceRegular(listPrice);
-//						snapshot.setPriceDiscount(offerPrice);
-//						snapshots.add(snapshot);
-//
-//						product.setName(productName);
-//						product.setImages(images);
-//						product.setSnapshotDetail(snapshots);
-//						product.setCategory(ci.category);
-//						product.setGender(ci.gender);
-//						product.setProductUrl(productUrl);
-//						product.setProductId(dataProductId);
-//						product.setBrand(allProducts.getBrand());
-//
-//						allProducts.getProducts().put(dataProductId, product);
+
 					} catch (Exception e) {
 						logger.info(String.format("Error getting product on page %s", ci.url));
 						logger.error("Error getting product", e);
@@ -168,16 +145,12 @@ public class AfCrawler extends ProductQueue {
 			Gender gender = new Gender();
 			String genderName = g.text().toLowerCase();
 			gender.setName(genderName);
-			//allProducts.getGenders().put(genderName, gender);
 
 			GenderInfo genderInfo = new GenderInfo();
 			genderInfo.gender = gender;
 			genderInfo.url = g.absUrl("href");
 			genderUrls.add(genderInfo);
 		}
-
-		// logger.info(String.format("%s gender urls found!",
-		// genderUrls.size()));
 
 		return genderUrls;
 	}
@@ -188,7 +161,7 @@ public class AfCrawler extends ProductQueue {
 		for (GenderInfo genderUrl : genderUrls) {
 			Document docCate = Util.getConnWithUserAgent(genderUrl.url).get();
 			Elements discounts = docCate.select("ul.primary li a[href*=sale], a[href*=clearance], a[href*=secret]").not("[class]");
-			//, a[href*=special-offers]
+
 			for (Element d : discounts) {
 				Document docDiscount = Util.getConnWithUserAgent(d.absUrl("href")).get();
 				Elements categoryElements = docDiscount.select("li.current.selected ul.secondary li");
@@ -202,7 +175,6 @@ public class AfCrawler extends ProductQueue {
 
 					Category category = new Category();
 					category.setName(categoryName);
-					//allProducts.getCategories().put(categoryName, category);
 
 					CategoryInfo categoryInfo = new CategoryInfo();
 					categoryInfo.gender = genderUrl.gender;

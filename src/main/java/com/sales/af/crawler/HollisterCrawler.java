@@ -12,14 +12,11 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.sales.af.crawler.AfCrawler.GenderInfo;
 import com.sales.af.to.SnapshotDetailTo;
 import com.sales.af.to.SnapshotTo;
 import com.sales.af.util.Util;
@@ -43,16 +40,19 @@ public class HollisterCrawler extends ProductQueue {
 
 	@Value("${hollisterProductAPI}")
 	private String hollisterProductAPI;
+	
+	@Value("${minDiscount}")
+	private Float minDiscount;
 
 	public void crawl() throws InterruptedException, IOException {
 		long startTime = System.currentTimeMillis();
 		logger.info(String.format("Start crawling with %s", HollisterCrawler.class.getName()));
-
+		
 		if (!isRunnable.tryAcquire()) {
 			logger.info(String.format("%s is already running. Skip crawling.", HollisterCrawler.class.getName()));
 			return;
 		}
-
+		
 		allProducts = new SnapshotTo();
 		allProducts.setSnapshotDetail(new HashMap<Long, SnapshotDetailTo>());
 
@@ -119,6 +119,11 @@ public class HollisterCrawler extends ProductQueue {
 	
 						if (offerPrice == null || listPrice == null || offerPrice == 0 || listPrice == 0
 								|| offerPrice.equals(listPrice)) {
+							continue;
+						}
+						
+						float discount = (listPrice - offerPrice) / listPrice;
+						if(discount <= minDiscount) {
 							continue;
 						}
 						

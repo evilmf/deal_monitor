@@ -147,12 +147,12 @@ body, html {
     margin-left: 10px;
     padding: 2px 0 0 4px;
     text-align: left;
-    border-radius: 0;
+    border-radius: 4px;
     -webkit-transition: none;
     -webkit-box-shadow: none;
     transition: none;
     box-shadow: none;
-    border: none;
+    border: 1px solid #cccccc;
 }
 
 .start {
@@ -262,7 +262,7 @@ body, html {
     font-weight: 700;
     color: #60a430;
     font-size: 15px;
-    max-width: 100px;
+    max-width: 120px;
     line-height: 18px;
     overflow: hidden;
     white-space: nowrap;
@@ -415,10 +415,10 @@ body, html {
 
 .search-result-cell {
 	width: 465px;
-	height: 100px;
+	height: 97px;
 	/*border-bottom: 1px solid grey;
 	border-radius: 4px;*/
-	margin: 0 5px 10px 0;
+	margin: 0 5px 0 0;
 	cursor: pointer;
 }
 
