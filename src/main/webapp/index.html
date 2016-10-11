@@ -86,11 +86,16 @@
 						aria-hidden="true"></span></a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li>	
 			</ul>
 		</div>
-		<div class="search-content" ng-style="$root.pageCntStyle" ng-show="true">
+		<!-- div class="search-content" ng-style="$root.pageCntStyle" ng-show="showSearchResult">
 			<div class="search-cnt">
 				<search-detail>
 				</search-detail>
 			</div>
+		</div-->
+		<div ng-controller="dropdownCtrl" class="search-dropdown" style="z-index: 100;" ng-show="showSearchResult">
+			<div style="position: fixed; left: 409px; top: 60px; background-color: white; z-index: 101; width: 486px;"><a style="text-align: center; font-weight: bold; display: block; width: 100%;" href ng-click="hideSearchResult()">Close</a></div>
+			<search-detail>
+			</search-detail>
 		</div>
 		<div ng-view class="page-content" ng-style="$root.pageCntStyle"></div>
 	</div>

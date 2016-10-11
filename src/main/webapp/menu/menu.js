@@ -28,11 +28,19 @@ menuModule.controller('menuCtrl', ['snapshotService', 'menuService', '$log', '$r
 	$rootScope.getSearchResult = function(keyword) {
 		if(keyword.trim().length >= 3 ) {
 			menuService.getSearchResult(keyword).success(function(res) {
-				$rootScope.searchResult = res;
+				if(res != undefined && res.length != 0) {
+					$rootScope.searchResult = res;
+					$rootScope.showSearchResult = true;
+				}
+				else {
+					$rootScope.searchResult = undefined;
+					$rootScope.showSearchResult = false;
+				}
 			});
 		}
 		else {
 			$rootScope.searchResult = undefined;
+			$rootScope.showSearchResult = false;
 		}
 	};
 	
@@ -115,7 +123,7 @@ menuModule.factory('menuService', ['$http', '$log', '$filter', 'durationFilter',
 		content['searchResult'] = searchResult;
 		content['parsedImageUrl'] = function() { if(angular.equals(this.brandName, 'abercrombie & fitch') || angular.equals(this.brandName, 'hollister')) { return this.imageUrl + '?$product-anf-v1$&$category-anf-v1$&wid=94&hei=94';} else { return this.imageUrl; } };
 		
-		var tpl = '{{#searchResult}}<div list-product-snapshot productId="{{productId}}" class="search-result-cell pull-left">'
+		var tpl = '<div style="height: 19px; width: 100%; background-color: white;"></div>{{#searchResult}}<div list-product-snapshot productId="{{productId}}" class="search-result-cell pull-left">'
 			+ '<div class="cell-img-cnt pull-left">'
 			+ '<img class="cell-img" src="{{parsedImageUrl}}" />'
 			+ '</div>'
@@ -127,7 +135,7 @@ menuModule.factory('menuService', ['$http', '$log', '$filter', 'durationFilter',
 			+ '</div>'
 			+ '<div style="clear: both;"></div>'
 			+ '<div class="bottom-border"></div>'				
-			+ '</div><{{/searchResult}}';
+			+ '</div><{{/searchResult}}<div style="clear: both;"></div>';
 		
 		return searchResult == undefined ? '' : Mustache.render(tpl, content);
 	};
@@ -137,7 +145,7 @@ menuModule.factory('menuService', ['$http', '$log', '$filter', 'durationFilter',
 		productSnapshots['inactiveDateFormatted'] = function() { return $filter('date')(this.inactiveDate, 'yyyy-MM-dd HH:mm:ss'); };
 		productSnapshots['durationFormatted'] = function() { return durationFilter(this.duration); };
 		
-		var tpl = '<table class="table table-hover">'
+		var tpl = '<table class="table table-hover product-snapshot-table">'
 			+ '<thead><tr>'
 			+ '<th>Snapshot</th>'
 			+ '<th>Price</th>'
@@ -145,7 +153,7 @@ menuModule.factory('menuService', ['$http', '$log', '$filter', 'durationFilter',
 			+ '<th>Inactive Time</th>'
 			+ '<th>Duration</th>'
 			+ '</tr></thead><tbody>'
-			+ '{{#productSnapshotList}}<tr>'
+			+ '{{#productSnapshotList}}<tr ng-click="setSnapshotId({{snapshotId}})" style="cursor: pointer;">'
 			+ '<th scope="row">{{snapshotId}}</th>'
 			+ '<td>${{price}}</td>'
 			+ '<td>{{activeDateFormatted}}</td>'
@@ -177,15 +185,12 @@ menuModule.directive('searchDetail', ['$rootScope', '$log', '$compile', 'menuSer
 			}, true);
 		}
 	};
-	
 }]);
 
 menuModule.directive('listProductSnapshot', ['$rootScope', '$log', '$compile', '$uibModal', 'menuService',
                                      function($rootScope, $log, $compile, $uibModal, menuService) {
 	var link = function(scope, element, attr) {
-		element.on('click', function(event) {
-			$log.log(attr.productid);
-			
+		element.on('click', function(event) {		
 			menuService.getProductSnapshots(attr.productid).success(function(res) {
 				var content = menuService.getProductSnapshotContent(res);
 				
@@ -194,8 +199,8 @@ menuModule.directive('listProductSnapshot', ['$rootScope', '$log', '$compile', '
 						template : content,
 						windowClass : 'product-snapshot-list-modal',
 						backdrop : true,
-						backdropClass : 'filter-backdrop-fade'//,
-						//controller: 'snapshotFilterCtrl'
+						//backdropClass : 'filter-backdrop-fade',
+						controller: 'productSnapshotModalCtrl'
 					});
 				}
 			});
@@ -239,7 +244,19 @@ menuModule.filter('duration', ['$log', function($log){
 	};
 }]);
 
+menuModule.controller('productSnapshotModalCtrl', ['$log', '$rootScope', function($log, $rootScope) {	
+	$rootScope.setSnapshotId = function(id) {
+		$rootScope.currentSnapshotId = id;
+		$rootScope.showSearchResult = false;
+	};
+}]);
 
+menuModule.controller('dropdownCtrl', ['$log', '$rootScope', function($log, $rootScope) {
+	$rootScope.hideSearchResult = function() {
+		$rootScope.showSearchResult = false;
+		$log.log('Hide search result.');
+	};
+}]);
 
 
 

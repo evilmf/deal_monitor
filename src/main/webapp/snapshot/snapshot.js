@@ -178,7 +178,7 @@ snapshotModule.factory('snapshotService', ['$http', '$log', 'orderFilter', 'cate
 		filteredProducts['ebaySearchKeyword'] = function() { return encodeURIComponent(this.productName + ' ' + this.brandName); };
 		filteredProducts['parsedImageUrl'] = function() { if(angular.equals(this.brandName, 'abercrombie & fitch') || angular.equals(this.brandName, 'hollister')) { return this.images[0] + '?$product-anf-v1$&$category-anf-v1$&wid=206&hei=206';} else { return this.images[0]; } };
 		
-		var tpl = '{{#new}}' 
+		var tpl = '<div style="clear: both;"></div>{{#new}}' 
 			+ '<div class="prod-cnt pull-left">'
 			+ '<div class="prod-img-cnt">'
 			+ '<span class="new">NEW</span>'

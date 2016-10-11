@@ -43,7 +43,8 @@ public class SnapshotLoader extends ProductQueue {
 		Map<Long, SnapshotDetailTo> productMap = allProducts.getSnapshotDetail();
 
 		for (Long pid : currentSnapshotMap.keySet()) {
-			if (!productMap.containsKey(pid)) {
+			if (!productMap.containsKey(pid) || currentSnapshotMap.get(pid).getPriceDiscount() != productMap
+					.get(pid).getPriceDiscount()) {
 				SnapshotDetail snapshotDetail = new SnapshotDetail();
 				snapshotDetail.setIsActive(false);
 				snapshotDetail.setPriceDiscount(currentSnapshotMap.get(pid).getPriceDiscount());

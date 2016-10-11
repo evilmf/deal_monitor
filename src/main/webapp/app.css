@@ -439,8 +439,8 @@ body, html {
 	margin: 6px 0 3px 10px;
 	width: 357px;
 	padding-left: 10px;
-	border-left: 1px solid grey;
-	border-right: 1px solid grey;
+	/*border-left: 1px solid grey;
+	border-right: 1px solid grey;*/
 }
 
 .cell-img {
@@ -484,21 +484,38 @@ body, html {
 }
 
 .bottom-border {
-	border-bottom: 1px solid grey; 
-	margin: 0 5px 0 5px; 
+	/*border-bottom: 1px solid grey; 
+	margin: 0 5px 0 5px; */
 	width: 450px;
 }
 
 .product-snapshot-list-modal .modal-dialog {
-	min-width: 700px;
+	min-width: 740px;
+}
+
+.product-snapshot-list-modal .modal-dialog .product-snapshot-table
+{
+	margin: 15px auto;
+	width: 95%
 }
 
 search-detail>span.ng-scope {
 	display: none;
 }
 
-
-/*
-border: 1px solid #cccccc;
-    border-radius: 4px;
-*/
+.search-dropdown {
+	position: fixed;
+	width: 486px;
+	min-height: 100px;
+	max-height: 60%;
+	/*border: 1px solid grey;*/
+	border-left: 1px solid #adadad;
+	border-right: 1px solid #adadad;
+	border-bottom: 1px solid #adadad;
+	background-color: white;
+	left: 408px;
+	top: 60px;
+	overflow-y: scroll;
+	box-shadow: 5px 5px 2px rgba(173, 173, 173, 0.34);
+	/*border-radius: 4px;*/
+}

@@ -41,7 +41,14 @@
 
 	<named-native-query name="getCurrentSnapshot">
 		<query><![CDATA[select 
-						*
+							id,
+							product_id,
+							price_regular,
+							price_discount,
+							snapshot_id,
+							is_active,
+							create_date,
+							rank
 						from (
 							select
 							sd.*,
