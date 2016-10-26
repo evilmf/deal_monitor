@@ -37,7 +37,7 @@ snapshotFilterModule.factory('snapshotFilterService', ['$log', '$cookies', '$htt
 			}
 			
 			if(categoryFilter[product['brandId']][product['genderId']][product['categoryId']] == undefined) {
-				categoryFilter[product['brandId']][product['genderId']][product['categoryId']] = true;
+				categoryFilter[product['brandId']][product['genderId']][product['categoryId']] = false;
 			}
 		});
 			
