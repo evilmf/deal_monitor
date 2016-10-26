@@ -21,8 +21,7 @@ public interface SnapshotDetailDao {
 
 	public Map<Long, SnapshotDetailTo> generateSnapshotDetailById(Long currentSnapshotId);
 
-	public String insertSnapshot(Map<Long, SnapshotDetailTo> snapshot, Long sid)
-			throws JsonProcessingException, IOException;
+	public String insertSnapshot(Map<Long, SnapshotDetailTo> snapshot, Long sid);
 
 	public SnapshotTo getSnapshotDetailById(Long currentSnapshotId)
 			throws JsonParseException, JsonMappingException, IOException;
@@ -32,4 +31,6 @@ public interface SnapshotDetailDao {
 	public SnapshotTo getSnapshotNoDetail();
 	
 	public Object[] getSnapshotListByProductId(Long productId);
+	
+	public Map<Long, SnapshotDetail> getCurrentSnapshot();
 }

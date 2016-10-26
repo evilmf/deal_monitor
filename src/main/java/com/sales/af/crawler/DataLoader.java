@@ -1,14 +1,16 @@
 package com.sales.af.crawler;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sales.af.bo.Brand;
 import com.sales.af.bo.Category;
@@ -20,18 +22,19 @@ import com.sales.af.dao.BrandDao;
 import com.sales.af.dao.CategoryDao;
 import com.sales.af.dao.GenderDao;
 import com.sales.af.dao.ProductDao;
-import com.sales.af.to.ProductsTo;
 import com.sales.af.to.SnapshotDetailTo;
-import com.sales.af.to.SnapshotTo;
 
-public class DataLoader extends ProductQueue {
-	private static Logger logger = Logger.getLogger(DataLoader.class);
-	private SnapshotTo allProducts;
-	private String brandName;
-	private Set<String> genderNames;
-	private Set<String> categoryNames;
-	private Set<String> productDataIds;
-
+public class DataLoader {
+	private static Logger LOGGER = Logger.getLogger(DataLoader.class);
+	
+	private static ConcurrentHashMap<String, Long> existingBrand;
+	private static ConcurrentHashMap<String, Long> existingGender;
+	private static ConcurrentHashMap<String, Long> existingCategory;
+	private static Map<Long, Map<String, Product>> existingProducts;
+	
+	@Autowired
+	ProductQueueService productQueueService;
+	
 	@Autowired
 	GenderDao genderDao;
 
@@ -43,209 +46,166 @@ public class DataLoader extends ProductQueue {
 
 	@Autowired
 	ProductDao productDao;
-
-	public void load() throws InterruptedException {
-		allProducts = productQueue.poll();
-		if (allProducts != null && allProducts.getSnapshotDetail().size() > 0) {
-			long startTime = System.currentTimeMillis();
-			setBrandInfo(allProducts);
-			logger.info(String.format("Start Loading Products for Brand: %s; Queue Size: %s",
-					brandName, productQueue.size()));
-
-			loadBrand();
-			loadGender();
-			loadCategory();
-			loadProduct();
-
-			addToSnapshotQueue();
-
-			long endTime = System.currentTimeMillis();
-			logger.info(String.format("Done Loading for Brand %s; Queue Size: %s; Duration: %s ms",
-					allProducts.getBrandId(), productQueue.size(), endTime - startTime));
-		}
+	
+	public DataLoader() {
+		LOGGER.info("Initializing...");
+		
+		existingBrand = new ConcurrentHashMap<String, Long>();
+		existingGender = new ConcurrentHashMap<String, Long>();
+		existingCategory = new ConcurrentHashMap<String, Long>();
+		existingProducts = new HashMap<Long, Map<String, Product>>();
+		
+		LOGGER.info("Done initializing!");
 	}
-
-	private void loadBrand() {
-		if (existingBrand.containsKey(brandName)) {
-			logger.info(String.format("Brand %s exists in memory.", brandName));
-			allProducts.setBrandId(existingBrand.get(brandName)); 
-
-		} else {
-			logger.info(String.format("Loading brand %s into DB and memory.", brandName));
+	
+	@Transactional
+	public void load() {
+		Set<SnapshotDetailTo> products = productQueueService.pollProductQueue();
+		Map<Long, SnapshotDetailTo> snapshotTo = new HashMap<Long, SnapshotDetailTo>();
+		
+		if(products == null) {
+			return;
+		}
+		
+		if(!products.isEmpty()) {
+			for(SnapshotDetailTo product : products) {
+				String brandName = product.getBrandName();
+				Long brandId = getBrandId(brandName);
+				
+				String genderName = product.getGenderName();
+				Long genderId = getGenderId(genderName);
+				
+				String categoryName = product.getCategoryName();
+				Long categoryId = getCategoryId(categoryName);
+				
+				String dataProductId = product.getProductDataId();
+				
+				if(!existingProducts.containsKey(brandId)) {
+					Map<String, Product> p = productDao.getProductByBrandId(brandId);
+					if(p != null) {
+						existingProducts.put(brandId, p);
+					} 
+				}
+				
+				if(!existingProducts.get(brandId).containsKey(dataProductId)) {
+					Product p = new Product();
+					
+					Brand brand = new Brand();
+					brand.setId(brandId);
+					p.setBrand(brand);
+					
+					Gender gender = new Gender();
+					gender.setId(genderId);
+					p.setGender(gender);
+					
+					Category category = new Category();
+					category.setId(categoryId);
+					p.setCategory(category);
+					
+					p.setCount(1);
+					
+					List<Image> images = new ArrayList<Image>();
+					List<SnapshotDetail> snapshots = new ArrayList<SnapshotDetail>();
+					
+					for(String imageUrl : product.getImages()) {
+						Image image = new Image();
+						image.setImageUrl(imageUrl);
+						images.add(image);
+					}
+					
+					p.setName(product.getProductName());
+					p.setImages(images);
+					p.setSnapshotDetail(snapshots);
+					p.setProductId(dataProductId);
+					p.setProductUrl(product.getProductUrl());
+					
+					p = productDao.insertProduct(p);
+					
+					existingProducts.get(brandId).put(p.getProductId(), p);
+					product.setProductId(p.getId());
+					
+					LOGGER.info(String.format(
+							"Insert Product %s ID %s into DB; Category: %s; Gender: %s; Product ID: %s; List Price: %s; Offer Price: %s",
+							p.getId(), p.getName(), product.getCategoryName(), product.getGenderName(), p.getProductId(),
+							product.getPriceRegular(),
+							product.getPriceDiscount()));
+				} 
+				else {
+					product.setProductId(existingProducts.get(brandId).get(dataProductId).getId());
+					
+					if(!product.getProductUrl().equals(existingProducts.get(brandId).get(dataProductId).getProductUrl())) {
+						existingProducts.get(brandId).get(dataProductId).setProductUrl(product.getProductUrl());
+						existingProducts.get(brandId).get(dataProductId).setUpdateDate(new Date());
+						
+						productDao.updateProductUrl(product.getProductId(), product.getProductUrl());
+					}
+				}
+				
+				snapshotTo.put(product.getProductId(), product);
+			}
+		}
+		else {
+			LOGGER.warn("Produc from Product Queue is empty!");
+		}
+		
+		if(!snapshotTo.isEmpty()) {
+			productQueueService.addSnapshot(snapshotTo);
+		}
+		
+		LOGGER.info(String.format("Done running data loader! Number of products to load: %s.", snapshotTo.size()));
+	}
+	
+	private Long getBrandId(String brandName) {
+		if(!existingBrand.containsKey(brandName)) {
 			Brand brand = brandDao.getBrandByName(brandName);
-
-			if (brand == null) {
-				logger.info(String.format("Inserting brand %s into DB", brandName));
+			
+			if(brand == null) {
+				LOGGER.info(String.format("Inserting brand %s into DB", brandName));
 				brand = brandDao.insertBrand(brandName);
-			} else {
-				logger.info(String.format("Brand %s already exists in the DB", brandName));
+			} 
+			else {
+				LOGGER.info(String.format("Brand %s already exists in the DB", brandName));
 			}
 			
-			allProducts.setBrandId(brand.getId());
-			existingBrand.put(brandName, allProducts.getBrandId());
-			logger.info(String.format("Brand %s has id %s", brandName, allProducts.getBrandId()));
-		}
-	}
-
-	private void loadGender() {
-		for (String genderName : genderNames) {
-			if (existingGender.containsKey(genderName.toLowerCase())) {
-				logger.debug(String.format("Gender %s exists in memory.", genderName));
-				//allProducts.getGenders().get(genderName)
-				//		.setId(existingGender.get(genderName.toLowerCase()).longValue());
-			} else {
-				logger.info(String.format("Loading gender %s into DB and memory", genderName));
-				Gender gender = genderDao.getGenderByName(genderName.toLowerCase());
-
-				if (gender == null) {
-					logger.debug(String.format("Insert gender %s into DB", genderName));
-					//allProducts.getGenders().put(genderName,
-					//		genderDao.insertGender(allProducts.getGenders().get(genderName)));
-					gender = genderDao.insertGender(genderName);
-
-				} else {
-					logger.debug(String.format("Gender %s already exists in the DB", genderName.toLowerCase()));
-					//allProducts.getGenders().put(genderName, gender);
-				}
-
-				existingGender.put(genderName, gender.getId());
-				logger.debug(String.format("Gender %s has id %s", genderName,
-						gender.getId()));
-			}
-
-		}
-	}
-
-	private void loadCategory() {
-		for (String categoryName : categoryNames) {
-			if (existingCategory.containsKey(categoryName.toLowerCase())) {
-				logger.debug(String.format("Category %s exists in memory.", categoryName));
-				//allProducts.getCategories().get(categoryName)
-				//		.setId(existingCategory.get(categoryName.toLowerCase()).longValue());
-			} else {
-				logger.debug(String.format("Loading category %s into DB and memory", categoryName));
-				Category category = categoryDao.getCategoryByName(categoryName.toLowerCase());
-
-				if (category == null) {
-					logger.debug(String.format("Insert category %s into DB", categoryName));
-					//allProducts.getCategories().put(categoryName,
-					//		categoryDao.insertCategory(allProducts.getCategories().get(categoryName)));
-					category = categoryDao.insertCategory(categoryName);
-				} else {
-					logger.debug(String.format("Category %s already exists in the DB", categoryName.toLowerCase()));
-					//allProducts.getCategories().put(categoryName, category);
-				}
-
-				existingCategory.put(categoryName, category.getId());
-				logger.debug(String.format("Category %s has id %s", categoryName,
-						category.getId()));
-			}
-		}
-	}
-
-	private void loadProduct() {
-		long startTime = System.currentTimeMillis();
-		Map<String, Product> existingProducts = productDao.getProductByProdIdAndBrandId(
-				new ArrayList<String>(productDataIds), allProducts.getBrandId());
-		for (SnapshotDetailTo snapshotDetailTo : allProducts.getSnapshotDetail().values()) {
-			Product product = new Product();
-			String dataProductId = snapshotDetailTo.getProductDataId();
-			if (!existingProducts.containsKey(dataProductId)) {
-				Brand brand = new Brand();
-				product.setBrand(brand);
-				Gender gender = new Gender();
-				product.setGender(gender);
-				Category category = new Category();
-				product.setCategory(category);
-				
-				product.getBrand().setId(allProducts.getBrandId());
-				product.getGender().setId(existingGender.get(snapshotDetailTo.getGenderName().toLowerCase()));
-				product.getCategory().setId(existingCategory.get(snapshotDetailTo.getCategoryName().toLowerCase()));
-				product.setCount(1);
-				
-				List<Image> images = new ArrayList<Image>();
-				List<SnapshotDetail> snapshots = new ArrayList<SnapshotDetail>();
-				
-				for(String imageUrl : snapshotDetailTo.getImages()) {
-					Image image = new Image();
-					image.setImageUrl(imageUrl);
-					images.add(image);
-				}
-				
-				product.setName(snapshotDetailTo.getProductName());
-				product.setImages(images);
-				product.setSnapshotDetail(snapshots);
-				product.setProductId(dataProductId);
-				product.setProductUrl(snapshotDetailTo.getProductUrl());
-
-				Product p = productDao.insertProduct(product);
-//				p.getSnapshotDetail().get(0).setPriceDiscount(
-//						allProducts.getProducts().get(dataProductId).getSnapshotDetail().get(0).getPriceDiscount());
-//				p.getSnapshotDetail().get(0).setPriceRegular(
-//						allProducts.getProducts().get(dataProductId).getSnapshotDetail().get(0).getPriceRegular());
-//				allProducts.getProducts().put(dataProductId, p);
-				snapshotDetailTo.setProductId(p.getId());
-				logger.debug(String.format(
-						"Insert Product %s ID %s into DB; Category: %s; Gender: %s; Product ID: %s; List Price: %s; Offer Price: %s",
-						p.getId(), p.getName(), snapshotDetailTo.getCategoryName(), snapshotDetailTo.getGenderName(), p.getProductId(),
-						snapshotDetailTo.getPriceRegular(),
-						snapshotDetailTo.getPriceDiscount()));
-			} else {
-				logger.debug(String.format(
-						"Product %s already exists in DB; Category: %s; Gender: %s; Product ID: %s Duration: %sms",
-						snapshotDetailTo.getBrandName(), snapshotDetailTo.getCategoryName(), snapshotDetailTo.getGenderName(),
-						product.getProductId(), System.currentTimeMillis() - startTime));
-//				existingProducts.get(dataProductId).setSnapshotDetail(product.getSnapshotDetail());
-//				allProducts.getProducts().put(dataProductId, existingProducts.get(dataProductId));
-				snapshotDetailTo.setProductId(existingProducts.get(dataProductId).getId());
-			}
-		}
-
-		long endTime = System.currentTimeMillis();
-		logger.info(String.format("Took %s ms to insert %s products from DB", endTime - startTime,
-				allProducts.getSnapshotDetail().size() - existingProducts.size()));
-	}
-	
-	private void setBrandInfo(SnapshotTo snapshotTo) {
-		genderNames = new HashSet<String>();
-		categoryNames = new HashSet<String>();
-		productDataIds = new HashSet<String>();
-		brandName = null;
-		for(SnapshotDetailTo snapshotDetailTo : snapshotTo.getSnapshotDetail().values()) {
-			if (brandName == null) { 
-				brandName = snapshotDetailTo.getBrandName().toLowerCase();
-			}
-			
-			genderNames.add(snapshotDetailTo.getGenderName().toLowerCase());
-			categoryNames.add(snapshotDetailTo.getCategoryName().toLowerCase());
-			productDataIds.add(snapshotDetailTo.getProductDataId());
-		}
-	}
-	
-	private SnapshotTo getSnapshotTo(ProductsTo products) {
-		SnapshotTo snapshotTo = new SnapshotTo();
-		snapshotTo.setSnapshotDetail(new HashMap<Long, SnapshotDetailTo>());
-		snapshotTo.setBrandId(products.getBrand().getId());
-		for(Product product : products.getProducts().values()) {
-			SnapshotDetailTo snapshotDetailTo = new SnapshotDetailTo();
-			snapshotDetailTo.setProductId(product.getId());
-			snapshotDetailTo.setPriceDiscount(product.getSnapshotDetail().get(0).getPriceDiscount());
-			snapshotDetailTo.setPriceRegular(product.getSnapshotDetail().get(0).getPriceRegular());
-			
-			snapshotTo.getSnapshotDetail().put(product.getId(), snapshotDetailTo);
+			existingBrand.put(brandName, brand.getId());
 		}
 		
-		return snapshotTo;
+		return existingBrand.get(brandName);
 	}
 	
-	private void addToSnapshotQueue() {
-		SnapshotTo snapshotTo = new SnapshotTo();
-		snapshotTo.setSnapshotDetail(new HashMap<Long, SnapshotDetailTo>());
-		snapshotTo.setBrandId(allProducts.getBrandId());
-		for(SnapshotDetailTo snapshotDetailTo : allProducts.getSnapshotDetail().values()) {
-			snapshotTo.getSnapshotDetail().put(snapshotDetailTo.getProductId(), snapshotDetailTo);
+	private Long getGenderId(String genderName) {
+		if(!existingGender.containsKey(genderName)) {
+			Gender gender = genderDao.getGenderByName(genderName);
+			
+			if(gender == null) {
+				LOGGER.info(String.format("Inserting gender %s into DB", genderName));
+				gender = genderDao.insertGender(genderName);
+			} 
+			else {
+				LOGGER.info(String.format("Gender %s already exists in the DB", genderName));
+			}
+			
+			existingGender.put(genderName, gender.getId());
 		}
 		
-		snapshotQueue.add(snapshotTo);
+		return existingGender.get(genderName);
+	}
+	
+	private Long getCategoryId(String categoryName) {
+		if(!existingCategory.containsKey(categoryName)) {
+			Category category = categoryDao.getCategoryByName(categoryName);
+			
+			if(category == null) {
+				LOGGER.info(String.format("Insert category %s into DB", categoryName));
+				category = categoryDao.insertCategory(categoryName);
+			} 
+			else {
+				LOGGER.info(String.format("Category %s already exists in the DB", categoryName.toLowerCase()));
+			}
+			
+			existingCategory.put(categoryName, category.getId());
+		}
+		
+		return existingCategory.get(categoryName);
 	}
 }

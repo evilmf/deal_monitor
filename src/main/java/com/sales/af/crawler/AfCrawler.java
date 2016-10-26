@@ -1,105 +1,91 @@
 package com.sales.af.crawler;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.Semaphore;
-
-import com.sales.af.bo.Category;
-import com.sales.af.bo.Gender;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import com.sales.af.to.SnapshotDetailTo;
-import com.sales.af.to.SnapshotTo;
 import com.sales.af.util.Util;
 
-public class AfCrawler extends ProductQueue {
-	private static Logger logger = Logger.getLogger(DataLoader.class);
+@Service
+public class AfCrawler implements Crawler {
 
-	private static final int size = 1;
-	private static Semaphore isRunnable = new Semaphore(size);
-	private static final String brandNameAF = "Abercrombie & Fitch";
+	private final static Logger LOGGER = Logger.getLogger(AfCrawler.class);
+	private static final String IMAGE_URL = "https://anf.scene7.com/is/image/anf/anf_%s_01_prod1";
+	private static final String HOME_PAGE_URL = "https://www.abercrombie.com";
+	private static final String BRAND_NAME = "Abercrombie & Fitch";
 
-	private SnapshotTo allProducts;
+	@Autowired
+	private RestTemplate restTemplate;
 
 	@Value("${afHomePage}")
 	private String afHomePage;
-	
+
+	@Value("${afProductAPI}")
+	private String afProductAPI;
+
 	@Value("${minDiscount}")
 	private Float minDiscount;
 
-	public void crawl() throws InterruptedException, IOException {
-		long startTime = System.currentTimeMillis();
-		logger.info(String.format("Start crawling with %s", AfCrawler.class.getName()));
+	@Override
+	public Set<SnapshotDetailTo> getProducts() {
+		Set<UrlInfo> urlInfoSet = getUrlInfo();
 
-		if (!isRunnable.tryAcquire()) {
-			logger.info(String.format("%s is already running. Skip crawling.", AfCrawler.class.getName()));
-			return;
-		}
-
-		allProducts = new SnapshotTo();
-		allProducts.setSnapshotDetail(new HashMap<Long, SnapshotDetailTo>()); 
-
-		try {
-			getProducts();
-
-			if (!allProducts.getSnapshotDetail().isEmpty()) {
-				logger.info(String.format("Enqueuing Brand: %s; Products Found: %s",
-						brandNameAF.toLowerCase(),
-						allProducts.getSnapshotDetail().size()));
-
-				productQueue.add(allProducts);
-			} 
-
-		} catch (Exception e) {
-			logger.error("Got exception while crawling", e);
-		} finally {
-			isRunnable.release();
-		}
-
-		long endTime = System.currentTimeMillis();
-		logger.info(String.format("Done crawling with %s; Duration: %s ms", AfCrawler.class.getName(),
-				endTime - startTime));
+		return crawl(urlInfoSet);
 	}
 
-	private void getProducts() throws IOException {
-		GenderInfoList genderUrls = getGenderUrls();
+	private Set<SnapshotDetailTo> crawl(Set<UrlInfo> urlInfoSet) {
+		Map<String, SnapshotDetailTo> products = new HashMap<String, SnapshotDetailTo>();
 
-		CategoryInfoList categoryUrls = getCategoryUrls(genderUrls);
-
-		for (CategoryInfo ci : categoryUrls) {
+		String url;
+		String res;
+		DocumentContext docCtx;
+		for (UrlInfo urlInfo : urlInfoSet) {
+			url = String.format(afProductAPI, urlInfo.storeId, urlInfo.catalogId, urlInfo.categoryId);
 			try {
-				Document docProduct = Util.getConnWithUserAgent(ci.url).get();
-				Elements productElements = docProduct
-						.select("ul.category-product-wrap.whiteoutarea li.product-wrap>div");
-
-				for (Element p : productElements) {
+				res = restTemplate.getForObject(url, String.class);
+				docCtx = JsonPath.parse(res);
+				int numOfProducts = (Integer) docCtx.read("$.categories[0].products.length()");
+				LOGGER.info(String.format("Number of products found for category id %s gender %s: %s",
+						urlInfo.categoryId, urlInfo.gender, numOfProducts));
+				LOGGER.info(url);
+				String productJsonPath = "$.categories[0].products[%s].%s";
+				
+				for(Integer i = 0; i < numOfProducts; i++) {
 					try {
-						String dataProductId = p.attr("data-productid");
-						String dataCollectionId = p.attr("data-collection");
-
-						Element prodInfo = p.select("div.product-info>div.name a").first();
-						String productName = prodInfo.text();
-						String productUrl = prodInfo.absUrl("href");
-						String imageUrl = String.format("http://anf.scene7.com/is/image/anf/anf_%s_01_prod1",
-								dataCollectionId);
-						Elements prodPrice = p.select(".product-price-v2__inner>span");
-						if (prodPrice.size() < 2) {
+						String productDataId = ((Integer) docCtx.read(String.format(productJsonPath, i.toString(), "id"))).toString();
+						String productName = (String) docCtx.read(String.format(productJsonPath, i, "name"));
+						String productImageUrl = String.format(IMAGE_URL, ((Integer) docCtx.read(String.format(productJsonPath, i, "productCollection"))).toString());
+						String productUrl = HOME_PAGE_URL + (String) docCtx.read(String.format(productJsonPath, i, "productUrl"));
+						String genderName = urlInfo.gender;
+						Float offerPrice = Float.parseFloat(StringUtils.strip((String) docCtx.read(String.format(productJsonPath, i, "price.priceLow")), "$"));
+						Float listPrice = Float.parseFloat(StringUtils.strip((String) docCtx.read(String.format(productJsonPath, i, "price.lowListPrice")), "$"));
+						Boolean showSalePrice = (Boolean) docCtx.read(String.format(productJsonPath, i, "price.showSalePrice"));
+						String categoryName = getCategoryName(productName).toLowerCase();
+						
+						if (showSalePrice == null || !showSalePrice) {
 							continue;
 						}
-
-						float listPrice = Util.getPrice(prodPrice.get(0).text());
-						float offerPrice = Util.getPrice(prodPrice.get(1).text());
-
-						if (listPrice == 0 || offerPrice == 0) {
-							logger.warn(String.format(
-									"Either list price [%s] or offer price [%s] is zero. Category URL: %s. Product Data ID: %. Product Name: %s.",
-									listPrice, offerPrice, ci.url, dataProductId, productName));
+	
+						if (offerPrice == null || listPrice == null || offerPrice == 0 || listPrice == 0
+								|| offerPrice.equals(listPrice)) {
 							continue;
 						}
 						
@@ -110,101 +96,79 @@ public class AfCrawler extends ProductQueue {
 						
 						SnapshotDetailTo snapshotDetailTo = new SnapshotDetailTo();
 						List<String> images = new ArrayList<String>();
-						images.add(imageUrl);
+						images.add(productImageUrl);
 
 						snapshotDetailTo.setProductName(productName);
 						snapshotDetailTo.setImages(images);
 						snapshotDetailTo.setPriceRegular(listPrice);
 						snapshotDetailTo.setPriceDiscount(offerPrice);
-						snapshotDetailTo.setCategoryName(ci.category.getName());
-						snapshotDetailTo.setGenderName(ci.gender.getName());
+						snapshotDetailTo.setCategoryName(categoryName);
+						snapshotDetailTo.setGenderName(genderName);
 						snapshotDetailTo.setProductUrl(productUrl);
-						snapshotDetailTo.setProductDataId(dataProductId);
-						snapshotDetailTo.setBrandName(brandNameAF.toLowerCase());
+						snapshotDetailTo.setProductDataId(productDataId);
+						snapshotDetailTo.setBrandName(BRAND_NAME.toLowerCase());
 						
-						allProducts.getSnapshotDetail().put(Long.parseLong(dataProductId), snapshotDetailTo);
-
-					} catch (Exception e) {
-						logger.info(String.format("Error getting product on page %s", ci.url));
-						logger.error("Error getting product", e);
+						products.put(productDataId, snapshotDetailTo);
 					}
-
+					catch(Exception e) {
+						LOGGER.info("Error getting product info.");
+						LOGGER.error("Error getting product", e);
+					}
 				}
-			} catch (Exception e) {
-				logger.error(String.format("Exception while crawling category %s", ci.category.getName()));
-				logger.error("Exception", e);
 			}
-		}
-	}
-
-	private GenderInfoList getGenderUrls() throws IOException {
-		GenderInfoList genderUrls = new GenderInfoList();
-		Document doc = Util.getConnWithUserAgent(afHomePage).get();
-		Elements genderElements = doc.select("a[href*=/mens][title=Mens], [href*=/womens][title=Womens]");
-		for (Element g : genderElements) {
-			Gender gender = new Gender();
-			String genderName = g.text().toLowerCase();
-			gender.setName(genderName);
-
-			GenderInfo genderInfo = new GenderInfo();
-			genderInfo.gender = gender;
-			genderInfo.url = g.absUrl("href");
-			genderUrls.add(genderInfo);
-		}
-
-		return genderUrls;
-	}
-
-	private CategoryInfoList getCategoryUrls(GenderInfoList genderUrls) throws IOException {
-		CategoryInfoList categoryUrls = new CategoryInfoList();
-
-		for (GenderInfo genderUrl : genderUrls) {
-			Document docCate = Util.getConnWithUserAgent(genderUrl.url).get();
-			Elements discounts = docCate.select("ul.primary li a[href*=sale], a[href*=clearance], a[href*=secret]").not("[class]");
-
-			for (Element d : discounts) {
-				Document docDiscount = Util.getConnWithUserAgent(d.absUrl("href")).get();
-				Elements categoryElements = docDiscount.select("li.current.selected ul.secondary li");
-				for (Element e : categoryElements) {
-					if (e.select("ul.tertiary").size() > 0) {
-						continue;
-					}
-
-					Element link = e.select("a").first();
-					String categoryName = link.text().toLowerCase().trim();
-
-					Category category = new Category();
-					category.setName(categoryName);
-
-					CategoryInfo categoryInfo = new CategoryInfo();
-					categoryInfo.gender = genderUrl.gender;
-					categoryInfo.url = link.absUrl("href");
-					categoryInfo.category = category;
-					categoryUrls.add(categoryInfo);
-				}
+			catch(Exception e) {
+				LOGGER.info(String.format("Error getting product on page %s", url));
+				LOGGER.error("Error getting product", e);
 			}
 		}
 
-		return categoryUrls;
+		return new HashSet<SnapshotDetailTo>(products.values());
 	}
 
+	private Set<UrlInfo> getUrlInfo() {
+		Set<UrlInfo> urlInfoSet = new HashSet<UrlInfo>();
+		UrlInfo urlInfo;
 
-	class GenderInfo {
-		public String url;
-		public Gender gender;
+		Document doc;
+		try {
+			doc = Util.getConnWithUserAgent(afHomePage).get();
+
+			Element storeElement = doc.select("input#desktop-search-storeId").first();
+			Long storeId = Long.parseLong(storeElement.attr("value"));
+
+			Element catalogElement = doc.select("input#desktop-search-catalogId").first();
+			Long catalogId = Long.parseLong(catalogElement.attr("value"));
+
+			for (String g : Arrays.asList("Men", "Women")) {
+				Elements menElements = doc.select(String.format("ul>li:matches(%s) ul>li>a:contains(clearance)", g));
+				for (Element e : menElements) {
+					urlInfo = new UrlInfo();
+					urlInfo.gender = g.toLowerCase();
+					urlInfo.storeId = storeId;
+					urlInfo.catalogId = catalogId;
+					urlInfo.categoryId = Long.parseLong(e.parent().attr("id").split("-")[1]);
+
+					urlInfoSet.add(urlInfo);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return urlInfoSet;
 	}
-	
-	class CategoryInfo {
-		public String url;
-		public Category category;
-		public Gender gender;
+
+	private String getCategoryName(String productName) {
+		String[] names = productName.split("[^a-zA-Z-]");
+		String categoryName = names[names.length - 1];
+
+		return categoryName == null || categoryName.length() == 0 ? "other" : categoryName;
 	}
-	
-	class GenderInfoList extends ArrayList<GenderInfo> {
-		private static final long serialVersionUID = 8327499788787399644L;
-	}
-	
-	class CategoryInfoList extends ArrayList<CategoryInfo> {
-		private static final long serialVersionUID = 4568037474241286411L;
+
+	private static class UrlInfo {
+		String gender;
+		Long categoryId;
+		Long storeId;
+		Long catalogId;
 	}
 }

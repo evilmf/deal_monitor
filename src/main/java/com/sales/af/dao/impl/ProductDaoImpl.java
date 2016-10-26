@@ -45,6 +45,25 @@ public class ProductDaoImpl implements ProductDao {
 		for (Product p : productList) {
 			products.put(p.getProductId(), p);
 		}
+		
+		return products;
+	}
+	
+	public Map<String, Product> getProductByBrandId(Long brandId) {
+		Map<String, Product> products = new HashMap<String, Product>();
+		
+		Query query = entityManager.createNamedQuery(
+				"getProductByBrand", Product.class);
+		Brand brand = new Brand();
+		brand.setId(brandId);
+		query.setParameter("brand", brand);
+
+		@SuppressWarnings("unchecked")
+		List<Product> productList = query.getResultList();
+		for (Product p : productList) {
+			products.put(p.getProductId(), p);
+		}
+		
 		return products;
 	}
 
@@ -80,5 +99,15 @@ public class ProductDaoImpl implements ProductDao {
 		}
 		
 		return query.getResultList().toArray();
+	}
+	
+	public boolean updateProductUrl(Long pid, String url) {
+		Query query = entityManager.createNamedQuery("updateProductUrlById");
+		query.setParameter("product_url", url);
+		query.setParameter("product_id", pid);
+		
+		int updated = query.executeUpdate();
+		
+		return updated == 1;
 	}
 }

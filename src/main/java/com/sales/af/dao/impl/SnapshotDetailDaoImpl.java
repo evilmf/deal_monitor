@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -44,7 +45,7 @@ public class SnapshotDetailDaoImpl implements SnapshotDetailDao {
 	public Map<Long, SnapshotDetail> getCurrentSnapshotByBrandId(long brandId) {
 		Map<Long, SnapshotDetail> snapshot = new HashMap<Long, SnapshotDetail>();
 
-		Query query = entityManager.createNamedQuery("getCurrentSnapshot");
+		Query query = entityManager.createNamedQuery("getCurrentSnapshotByBrand");
 		query.setParameter("brandId", brandId);
 
 		@SuppressWarnings("unchecked")
@@ -63,6 +64,30 @@ public class SnapshotDetailDaoImpl implements SnapshotDetailDao {
 			snapshot.put(sd.getProduct().getId(), sd);
 		}
 
+		return snapshot;
+	}
+	
+	public Map<Long, SnapshotDetail> getCurrentSnapshot() {
+		Map<Long, SnapshotDetail> snapshot = new HashMap<Long, SnapshotDetail>();
+
+		Query query = entityManager.createNamedQuery("getCurrentSnapshot");
+
+		@SuppressWarnings("unchecked")
+		List<Object> products = query.getResultList();
+		for (Object p : products) {
+			Object[] data = (Object[]) p;
+			SnapshotDetail sd = new SnapshotDetail();
+			sd.setId(((BigInteger) data[0]).longValue());
+			Product product = new Product();
+			product.setId(((BigInteger) data[1]).longValue());
+			sd.setProduct(product);
+			sd.setPriceRegular(((BigDecimal) data[2]).floatValue());
+			sd.setPriceDiscount(((BigDecimal) data[3]).floatValue());
+			sd.setSnapshotId(((BigInteger) data[4]).longValue());
+			sd.setIsActive((Boolean) data[5]);
+			snapshot.put(sd.getProduct().getId(), sd);
+		}
+		
 		return snapshot;
 	}
 
@@ -138,13 +163,23 @@ public class SnapshotDetailDaoImpl implements SnapshotDetailDao {
 	}
 
 	@Transactional
-	public String insertSnapshot(Map<Long, SnapshotDetailTo> snapshot, Long sid) throws IOException {
-		String snapshotJson = objectMapper.writeValueAsString(snapshot);
-
-		Snapshot sd = new Snapshot();
-		sd.setSnapshot(snapshotJson);
-		sd.setId(sid);
-		entityManager.merge(sd);
+	public String insertSnapshot(Map<Long, SnapshotDetailTo> snapshot, Long sid) {
+		String snapshotJson = "";
+		try {
+			snapshotJson = objectMapper.writeValueAsString(snapshot);
+			
+			Snapshot sd = new Snapshot();
+			sd.setSnapshot(snapshotJson);
+			sd.setId(sid);
+			entityManager.merge(sd);
+			
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		return snapshotJson;
 	}

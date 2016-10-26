@@ -1,6 +1,5 @@
 package com.sales.af.crawler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,36 +11,26 @@ import com.sales.af.bo.Product;
 import com.sales.af.bo.SnapshotDetail;
 import com.sales.af.dao.SnapshotDetailDao;
 import com.sales.af.to.SnapshotDetailTo;
-import com.sales.af.to.SnapshotTo;
 
-public class SnapshotLoader extends ProductQueue {
-	private static Logger logger = Logger.getLogger(SnapshotLoader.class);
-	private SnapshotTo allProducts;
-
+public class SnapshotLoader {
+	private static Logger LOGGER = Logger.getLogger(SnapshotLoader.class);
+	
+	@Autowired
+	ProductQueueService productQueueService;
+	
 	@Autowired
 	SnapshotDetailDao snapshotDetailDao;
-
-	public void load() throws InterruptedException, IOException {
-		allProducts = snapshotQueue.poll();
-		if (allProducts != null && allProducts.getSnapshotDetail() != null && allProducts.getSnapshotDetail().size() > 0) {
-			long startTime = System.currentTimeMillis();
-			logger.info(String.format("Start Loading Snapshot %s Products for Brand: %s; Queue Size: %s",
-					allProducts.getSnapshotDetail().size(), allProducts.getBrandId(), snapshotQueue.size()));
-
-			buildSnapshot();
-
-			long endTime = System.currentTimeMillis();
-			logger.info(String.format("Done Loading Snapshot for Brand %s; Queue Size: %s; Duration: %s ms",
-					allProducts.getBrandId(), productQueue.size(), endTime - startTime));
+	
+	public void load() {
+		Map<Long, SnapshotDetailTo> productMap = productQueueService.pollSnapshotQueue();
+		
+		if(productMap == null || productMap.isEmpty()) {
+			return;
 		}
-	}
-
-	public void buildSnapshot() throws IOException {
+		
 		List<SnapshotDetail> snapshotDetailList = new ArrayList<SnapshotDetail>();
-		Map<Long, SnapshotDetail> currentSnapshotMap = snapshotDetailDao
-				.getCurrentSnapshotByBrandId(allProducts.getBrandId());
-		Map<Long, SnapshotDetailTo> productMap = allProducts.getSnapshotDetail();
-
+		Map<Long, SnapshotDetail> currentSnapshotMap = snapshotDetailDao.getCurrentSnapshot();
+		
 		for (Long pid : currentSnapshotMap.keySet()) {
 			if (!productMap.containsKey(pid) || currentSnapshotMap.get(pid).getPriceDiscount() != productMap
 					.get(pid).getPriceDiscount()) {
@@ -70,8 +59,7 @@ public class SnapshotLoader extends ProductQueue {
 			}
 		}
 
-		logger.info(String.format("Start Inserting %s SnapshotDetail for Brand %s", snapshotDetailList.size(),
-				allProducts.getBrandId()));
+		LOGGER.info(String.format("Start Inserting %s SnapshotDetail.", snapshotDetailList.size()));
 
 		Long currentSnapshotId = 0L;
 		if (!snapshotDetailList.isEmpty()) {
@@ -83,7 +71,9 @@ public class SnapshotLoader extends ProductQueue {
 		for (Long sid : sidList) {
 			Map<Long, SnapshotDetailTo> snapshotDetailMap = snapshotDetailDao.generateSnapshotDetailById(sid);
 
-			logger.debug(snapshotDetailDao.insertSnapshot(snapshotDetailMap, sid));
+			LOGGER.debug(snapshotDetailDao.insertSnapshot(snapshotDetailMap, sid));
 		}
+		
+		LOGGER.info(String.format("Done running snapshot loader! Snapshot change: %s.", snapshotDetailList.size()));
 	}
 }

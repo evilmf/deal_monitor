@@ -85,39 +85,23 @@
 	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate"></bean>
 
 	<bean id="afCrawler" class="com.sales.af.crawler.AfCrawler"></bean>
-	<bean id="hollisterCrawler" class="com.sales.af.crawler.HollisterCrawler"></bean>
+	<bean id="holCrawler" class="com.sales.af.crawler.HollisterCrawler"></bean>
+	<bean id="productQueueService" class="com.sales.af.crawler.ProductQueueService"></bean>
+	
+	<bean id="productScanner" class="com.sales.af.crawler.ProductScanner"></bean>
 	<bean id="dataLoader" class="com.sales.af.crawler.DataLoader"></bean>
 	<bean id="snapshotLoader" class="com.sales.af.crawler.SnapshotLoader"></bean>
 
-
 	<task:annotation-driven />
-	<task:scheduled-tasks>
-		<task:scheduled ref="afCrawler" method="crawl"
-			fixed-delay="90000" initial-delay="1000" />
-		<task:scheduled ref="hollisterCrawler" method="crawl"
-			fixed-delay="90000" initial-delay="1000" />
+	<task:scheduled-tasks scheduler="defaultScheduler">
+		<task:scheduled ref="productScanner" method="scan"
+			fixed-delay="120000" initial-delay="10000" />
 		<task:scheduled ref="dataLoader" method="load"
 			fixed-delay="5000" initial-delay="1000" />
-		<task:scheduled ref="snapshotLoader" method="load"
-			fixed-delay="2000" initial-delay="1000" />
+			<task:scheduled ref="snapshotLoader" method="load"
+			fixed-delay="5000" initial-delay="1000" />
 	</task:scheduled-tasks>
-
+	
+	<task:scheduler id="defaultScheduler" pool-size="3" />
 </beans>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
