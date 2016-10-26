@@ -298,6 +298,12 @@ body, html {
 	padding: 20px;
 }
 
+.filter-modal-cnt .modal-dialog .modal-content .modal-body div#filterCheckbox {
+	max-height: 400px;
+	overflow-y: scroll;
+	margin-top: 10px;
+}
+
 .filter-backdrop-fade {
 	height: 100%;
 }
@@ -305,6 +311,11 @@ body, html {
 .setting-modal-cnt .modal-dialog {
 	width: 400px;
 	min-height: 400px;
+}
+
+body > div.modal.fade.ng-isolate-scope.product-snapshot-list-modal.in > div > div.modal-content {
+	max-height: 400px;
+	overflow-y: scroll;
 }
 
 .setting-modal-cnt .modal-dialog .modal-content {
