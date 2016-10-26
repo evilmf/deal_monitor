@@ -14,10 +14,12 @@ snapshotFilterModule.controller('snapshotFilterCtrl',
 	
 	$rootScope.processCategoryFilter = function(option) {
 		$rootScope.filteredCategory = snapshotFilterService.processCategoryFilter(option);
+		
+		$rootScope.categories[option.brandId]['gender'][option.genderId]['category'][option.categoryId]['selected'] = option.selected;
 	};
 	
 	$rootScope.$watch('categories', function() {
-    	$rootScope.filterOptions = snapshotFilterService.buildOptions($rootScope.categories);
+		$rootScope.filterOptions = snapshotFilterService.buildOptions($rootScope.categories);
     	
     	$rootScope.selectedOption = $rootScope.filterOptions[0];
     }, true);
