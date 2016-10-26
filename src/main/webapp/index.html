@@ -32,10 +32,10 @@
 							class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
 					</li>
 					<li class="quick-link-2"><span class="separator"></span></li>
-					<li class="quick-link-2 menu-btn-pointer" ng-click="preSnapshot()"> <span
+					<li title="Previous Snapshot" class="quick-link-2 menu-btn-pointer" ng-click="preSnapshot()"> <span
 							class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
 					</li>
-					<li class="quick-link-2"><input
+					<li title="Current Snapshot" class="quick-link-2"><input
 						ng-model="$root.currentSnapshotId" 
 						type="text"
 						class="form-control page-input page-input-left"
@@ -43,15 +43,15 @@
 						ng-change="getSnapshotById(currentSnapshotId)"></li>
 					<li class="quick-link-2"><span
 						class="header-padding page-input-separator">/</span></li>
-					<li class="quick-link-2"><input type="text"
+					<li title="Latest Snapshot" class="quick-link-2"><input type="text"
 						class="form-control page-input page-input-right"
 						aria-describedby="basic-addon2" value="{{latestSnapshotId}}" disabled></li>
-					<li class="quick-link-2 menu-btn-pointer" ng-click="nextSnapshot()"> <span
+					<li title="Next Snapshot" class="quick-link-2 menu-btn-pointer" ng-click="nextSnapshot()"> <span
 							class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
 					</li>
 					<li class="quick-link-2"><span class="control-separator"></span>
 					</li>
-					<li class="quick-link-2 menu-btn-pointer" ng-click="lastSnapshot()"> <span
+					<li title="Last Snapshot" class="quick-link-2 menu-btn-pointer" ng-click="lastSnapshot()"> <span
 							class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
 					</li>
 					<li class="quick-link-2"><span class="separator"></span></li>
@@ -63,7 +63,7 @@
 						placeholder="Search Products"
 						ng-model="$root.searchKeyword"
 						ng-change="getSearchResult(searchKeyword)"></li>
-					<li class="quick-link-2"><span class="timestamp">{{snapshotTimestamp | date:'yyyy-MM-dd HH:mm:ss'}}</span></li>
+					<li title="Snapshot Timestamp" class="quick-link-2"><span class="timestamp">{{snapshotTimestamp | date:'yyyy-MM-dd HH:mm:ss'}}</span></li>
 					<li class="quick-link-2"><div class="loading-cnt"><span us-spinner="{{spinOpts}}" spinner-key="loading"></span></div></li>
 				</ul>
 			</div>
