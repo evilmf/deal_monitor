@@ -46,6 +46,10 @@ public class AfCrawler implements Crawler {
 
 	@Override
 	public Set<SnapshotDetailTo> getProducts() {
+		/* Add exception handling here. It should handle all exception so that 
+		 * throwing exception here won't block the rest of the crawler from 
+		 * crawling.
+		 * */
 		Set<UrlInfo> urlInfoSet = getUrlInfo();
 
 		return crawl(urlInfoSet);
@@ -132,14 +136,14 @@ public class AfCrawler implements Crawler {
 		Document doc;
 		try {
 			doc = Util.getConnWithUserAgent(afHomePage).get();
+			
+			Element storeElement = doc.select("input[name=storeId]").first();
+			Long storeId = storeElement != null ? Long.parseLong(storeElement.attr("value")) : 10051L;
 
-			Element storeElement = doc.select("input#desktop-search-storeId").first();
-			Long storeId = Long.parseLong(storeElement.attr("value"));
+			Element catalogElement = doc.select("input[name=catalogId]").first();
+			Long catalogId = catalogElement != null ? Long.parseLong(catalogElement.attr("value")) : 10901L;
 
-			Element catalogElement = doc.select("input#desktop-search-catalogId").first();
-			Long catalogId = Long.parseLong(catalogElement.attr("value"));
-
-			for (String g : Arrays.asList("Men", "Women")) {
+			for (String g : Arrays.asList("Mens", "Womens")) {
 				Elements menElements = doc.select(String.format("ul>li:matches(%s) ul>li>a:contains(clearance)", g));
 				for (Element e : menElements) {
 					urlInfo = new UrlInfo();
@@ -151,6 +155,28 @@ public class AfCrawler implements Crawler {
 					urlInfoSet.add(urlInfo);
 				}
 			}
+			
+			if(urlInfoSet.isEmpty()) {
+				Map<Long, String> defaultCategories = new HashMap<Long, String>() {
+					private static final long serialVersionUID = 2740729364185064202L;
+					{
+						put(6234532L,"Womens");
+						put(6234533L,"Mens");
+						put(12205L,"Womens");
+						put(12204L,"Mens");
+					}
+				};
+				
+				for(Long categoryId : defaultCategories.keySet()) {
+					urlInfo = new UrlInfo();
+					urlInfo.gender = defaultCategories.get(categoryId).toLowerCase();
+					urlInfo.storeId = storeId;
+					urlInfo.catalogId = catalogId;
+					urlInfo.categoryId = categoryId;
+
+					urlInfoSet.add(urlInfo);
+				}
+			} 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
