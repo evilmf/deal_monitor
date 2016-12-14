@@ -66,57 +66,61 @@ public class AfCrawler implements Crawler {
 			try {
 				res = restTemplate.getForObject(url, String.class);
 				docCtx = JsonPath.parse(res);
-				int numOfProducts = (Integer) docCtx.read("$.categories[0].products.length()");
-				LOGGER.info(String.format("Number of products found for category id %s gender %s: %s",
-						urlInfo.categoryId, urlInfo.gender, numOfProducts));
-				LOGGER.info(url);
-				String productJsonPath = "$.categories[0].products[%s].%s";
 				
-				for(Integer i = 0; i < numOfProducts; i++) {
-					try {
-						String productDataId = ((Integer) docCtx.read(String.format(productJsonPath, i.toString(), "id"))).toString();
-						String productName = (String) docCtx.read(String.format(productJsonPath, i, "name"));
-						String productImageUrl = String.format(IMAGE_URL, ((Integer) docCtx.read(String.format(productJsonPath, i, "productCollection"))).toString());
-						String productUrl = HOME_PAGE_URL + (String) docCtx.read(String.format(productJsonPath, i, "productUrl"));
-						String genderName = urlInfo.gender;
-						Float offerPrice = Float.parseFloat(StringUtils.strip((String) docCtx.read(String.format(productJsonPath, i, "price.priceLow")), "$"));
-						Float listPrice = Float.parseFloat(StringUtils.strip((String) docCtx.read(String.format(productJsonPath, i, "price.lowListPrice")), "$"));
-						Boolean showSalePrice = (Boolean) docCtx.read(String.format(productJsonPath, i, "price.showSalePrice"));
-						String categoryName = getCategoryName(productName).toLowerCase();
-						
-						if (showSalePrice == null || !showSalePrice) {
-							continue;
-						}
+				LOGGER.info(url);
+				
+				String productJsonPath = "$.categories[%s].products[%s].%s";
+				int numOfCategories = (Integer) docCtx.read("$.categories.length()");
+				for(int c = 0; c < numOfCategories; c++) {
+					int numOfProducts = (Integer) docCtx.read(String.format("$.categories[%s].products.length()", c));
+					LOGGER.info(String.format("Number of products found for category id %s gender %s: %s",
+							urlInfo.categoryId, urlInfo.gender, numOfProducts));
+					for(Integer i = 0; i < numOfProducts; i++) {
+						try {
+							String productDataId = ((Integer) docCtx.read(String.format(productJsonPath, c, i.toString(), "id"))).toString();
+							String productName = (String) docCtx.read(String.format(productJsonPath, c, i, "name"));
+							String productImageUrl = String.format(IMAGE_URL, ((Integer) docCtx.read(String.format(productJsonPath, c, i, "productCollection"))).toString());
+							String productUrl = HOME_PAGE_URL + (String) docCtx.read(String.format(productJsonPath, c, i, "productUrl"));
+							String genderName = urlInfo.gender;
+							Float offerPrice = Float.parseFloat(StringUtils.strip((String) docCtx.read(String.format(productJsonPath, c, i, "price.priceLow")), "$"));
+							Float listPrice = Float.parseFloat(StringUtils.strip((String) docCtx.read(String.format(productJsonPath, c, i, "price.lowListPrice")), "$"));
+							Boolean showSalePrice = (Boolean) docCtx.read(String.format(productJsonPath, c, i, "price.showSalePrice"));
+							String categoryName = getCategoryName(productName).toLowerCase();
+							
+							if (showSalePrice == null || !showSalePrice) {
+								continue;
+							}
+		
+							if (offerPrice == null || listPrice == null || offerPrice == 0 || listPrice == 0
+									|| offerPrice.equals(listPrice)) {
+								continue;
+							}
+							
+							float discount = (listPrice - offerPrice) / listPrice;
+							if(discount <= minDiscount) {
+								continue;
+							}
+							
+							SnapshotDetailTo snapshotDetailTo = new SnapshotDetailTo();
+							List<String> images = new ArrayList<String>();
+							images.add(productImageUrl);
 	
-						if (offerPrice == null || listPrice == null || offerPrice == 0 || listPrice == 0
-								|| offerPrice.equals(listPrice)) {
-							continue;
+							snapshotDetailTo.setProductName(productName);
+							snapshotDetailTo.setImages(images);
+							snapshotDetailTo.setPriceRegular(listPrice);
+							snapshotDetailTo.setPriceDiscount(offerPrice);
+							snapshotDetailTo.setCategoryName(categoryName);
+							snapshotDetailTo.setGenderName(genderName);
+							snapshotDetailTo.setProductUrl(productUrl);
+							snapshotDetailTo.setProductDataId(productDataId);
+							snapshotDetailTo.setBrandName(BRAND_NAME.toLowerCase());
+							
+							products.put(productDataId, snapshotDetailTo);
 						}
-						
-						float discount = (listPrice - offerPrice) / listPrice;
-						if(discount <= minDiscount) {
-							continue;
+						catch(Exception e) {
+							LOGGER.info("Error getting product info.");
+							LOGGER.error("Error getting product", e);
 						}
-						
-						SnapshotDetailTo snapshotDetailTo = new SnapshotDetailTo();
-						List<String> images = new ArrayList<String>();
-						images.add(productImageUrl);
-
-						snapshotDetailTo.setProductName(productName);
-						snapshotDetailTo.setImages(images);
-						snapshotDetailTo.setPriceRegular(listPrice);
-						snapshotDetailTo.setPriceDiscount(offerPrice);
-						snapshotDetailTo.setCategoryName(categoryName);
-						snapshotDetailTo.setGenderName(genderName);
-						snapshotDetailTo.setProductUrl(productUrl);
-						snapshotDetailTo.setProductDataId(productDataId);
-						snapshotDetailTo.setBrandName(BRAND_NAME.toLowerCase());
-						
-						products.put(productDataId, snapshotDetailTo);
-					}
-					catch(Exception e) {
-						LOGGER.info("Error getting product info.");
-						LOGGER.error("Error getting product", e);
 					}
 				}
 			}
@@ -144,7 +148,7 @@ public class AfCrawler implements Crawler {
 			Long catalogId = catalogElement != null ? Long.parseLong(catalogElement.attr("value")) : 10901L;
 
 			for (String g : Arrays.asList("Mens", "Womens")) {
-				Elements menElements = doc.select(String.format("ul>li:matches(%s) ul>li>a:contains(clearance)", g));
+				Elements menElements = doc.select(String.format("ul>li:matches(%s) ul>li>a:contains(clearance), ul>li:matches(%s) ul>li>a:contains(sale)", g, g));
 				for (Element e : menElements) {
 					urlInfo = new UrlInfo();
 					urlInfo.gender = g.toLowerCase();
