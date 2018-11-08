@@ -1,0 +1,14 @@
+with snapshot_detail_tmp as ( select sd.* from (  
+select sd.*, row_number() over (partition by product_id order by id desc) rank  
+from snapshot_detail sd where snapshot_id <= ? ) sd where sd.rank = 1 and sd.is_active = true  
+) select sd.id, p.id product_id, p.product_id product_data_id,  
+p.create_date product_create_date, p.brand_id, b.name brand, p.gender_id,  
+g.name gender, p.category_id, c.name category, sd.snapshot_id, sd.price_regular,  
+sd.price_discount, round((sd.price_regular - sd.price_discount) / sd.price_regular, 2) discount,  
+case when sd.snapshot_id = ? then true else false end is_new, sd.create_date sd_create_date,  
+p.url prod_url, p.name prod_name, i.url img_url from snapshot_detail_tmp sd  
+join products p on p.id = sd.product_id and p.is_active = true  
+join brands b on b.id = p.brand_id and b.is_active = true  
+join genders g on g.id = p.gender_id and g.is_active = true  
+join categories c on c.id = p.category_id and c.is_active = true  
+left join images i on i.product_id = p.id order by sd.id desc

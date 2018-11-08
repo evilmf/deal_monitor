@@ -1,0 +1,60 @@
+<div>
+	<div class="modal-header ng-scope">
+		<h3 class="modal-title">Setting</h3>
+    </div>
+     <div class="modal-body ng-scope">
+        <div class="form-group">
+        	<label>Alert Sound:</label>
+	        <select class="form-control filter-setting">
+	        	<option value="beep.mp3">beep.mp3</option>
+	        	<!--option value="berry.mp3">berry.mp3</option>
+	        	<option value="musicbox.mp3">musicbox.mp3</option-->
+	      	</select>
+	  	</div>
+	  	<div class="form-group setting-filter-cnt">
+        	<label>Discount (%):</label>
+	        <ul class="filter-input-list">
+	        	<li class="quick-link-2">
+	        		<input type="text" ng-model="$root.setting.minDiscount" 
+	        		class="form-control page-input page-input-left" aria-describedby="basic-addon2"
+	        		ng-blur="setMinDiscount(setting.minDiscount)">
+	        	</li>
+	        	<li class="quick-link-2">
+	        		<span class="filter-input-separator">-</span>
+	        	</li>
+	        	<li class="quick-link-2">
+	        		<input type="text" ng-model="$root.setting.maxDiscount" 
+	        		class="form-control page-input page-input-left" aria-describedby="basic-addon2"
+	        		ng-blur="setMaxDiscount(setting.maxDiscount)">
+	        	</li>
+	        </ul>
+	  	</div>
+	  	<div class="form-group setting-filter-cnt">
+        	<label>Price ($):</label>
+	        <ul class="filter-input-list">
+	        	<li class="quick-link-2">
+	        		<input type="text" ng-model="$root.setting.minPrice" 
+	        		class="form-control page-input page-input-left" aria-describedby="basic-addon2"
+	        		ng-blur="setMinPrice(setting.minPrice)">
+	        	</li>
+	        	<li class="quick-link-2">
+	        		<span class="filter-input-separator">-</span>
+	        	</li>
+	        	<li class="quick-link-2">
+	        		<input type="text" ng-model="$root.setting.maxPrice" 
+	        		class="form-control page-input page-input-left" aria-describedby="basic-addon2"
+	        		ng-blur="setMaxPrice(setting.maxPrice)">
+	        	</li>
+	        </ul>
+	  	</div>
+	  	<div class="form-group setting-filter-cnt">
+        	<label>Sort By:</label>
+	        <ui-select multiple ng-model="$root.setting.orderBy" theme="select2" ng-disabled="disabled" style="width: 328px;" ng-change="setOrderBy(setting.orderBy)">
+				<ui-select-match placeholder="Select by...">{{$item.name}}</ui-select-match>
+			    <ui-select-choices repeat="by as by in $root.orderByOption | orderByOptionFilter">
+					<div ng-bind-html="by.name | highlight: $select.search"></div>
+			    </ui-select-choices>
+			</ui-select>
+	  	</div>
+    </div>
+</div>

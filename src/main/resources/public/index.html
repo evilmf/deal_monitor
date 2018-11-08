@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" data-ng-app="myApp" class="no-js">
+<!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Deal Monitor</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="bower_components/angular-bootstrap/css/bootstrap.css">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="bower_components/ui-select/dist/select.css">
+<!-- Select2 theme -->
+<link rel="stylesheet" href="select2/select2.css">
+</head>
+<body>
+	<div ng-controller="menuCtrl" class="header navbar">
+		<div class="header-quick-nav">
+			<div class="pull-left">
+				<ul class="nav quick-section nav-left">
+					<li class="quick-link menu-btn-pointer" sidebar-ctrl-btn><span
+							class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+					</li>
+					<li class="quick-link-2"><span class="header-padding"
+						aria-hidden="true"></span></li>
+					<li class="quick-link-2 disabled" tooltip="{{snapshotTimestamp | date:'yyyy-MM-dd HH:mm:ss'}}" tooltip-placement="bottom"><span
+							class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
+					</li>
+					<li class="quick-link-2"><span class="separator"></span></li>
+					<li title="Previous Snapshot" class="quick-link-2 menu-btn-pointer" ng-click="preSnapshot()"> <span
+							class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+					</li>
+					<li title="Current Snapshot" class="quick-link-2"><input
+						ng-model="$root.currentSnapshotId" 
+						type="text"
+						class="form-control page-input page-input-left"
+						aria-describedby="basic-addon2"
+						ng-change="getSnapshotById(currentSnapshotId)"></li>
+					<li class="quick-link-2"><span
+						class="header-padding page-input-separator">/</span></li>
+					<li title="Latest Snapshot" class="quick-link-2"><input type="text"
+						class="form-control page-input page-input-right"
+						aria-describedby="basic-addon2" value="{{latestSnapshotId}}" disabled></li>
+					<li title="Next Snapshot" class="quick-link-2 menu-btn-pointer" ng-click="nextSnapshot()"> <span
+							class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+					</li>
+					<li class="quick-link-2"><span class="control-separator"></span>
+					</li>
+					<li title="Last Snapshot" class="quick-link-2 menu-btn-pointer" ng-click="lastSnapshot()"> <span
+							class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+					</li>
+					<li class="quick-link-2"><span class="separator"></span></li>
+					<li class="quick-link-2"><span
+							class="glyphicon glyphicon-search" aria-hidden="true"></span>
+					</li>
+					<li class="quick-link-2"><input type="text"
+						class="form-control search-input" aria-describedby="basic-addon2"
+						placeholder="Search Products"
+						ng-model="$root.searchKeyword"
+						ng-change="getSearchResult(searchKeyword)"></li>
+					<li title="Snapshot Timestamp" class="quick-link-2"><span class="timestamp">{{snapshotTimestamp | date:'yyyy-MM-dd HH:mm:ss'}}</span></li>
+					<li class="quick-link-2"><div class="loading-cnt"><span us-spinner="{{spinOpts}}" spinner-key="loading"></span></div></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="main-container">
+		<div ng-controller="sidebarCtrl" class="sidebar" ng-show="showSidebar">
+			<ul class="sidebar-menu">
+				<li class="start"><a href><span class="glyphicon glyphicon-home"
+						aria-hidden="true"></span></a></li>
+				<li sidebar-setting-btn><a href><span class="glyphicon glyphicon-th-list"
+						aria-hidden="true"></span></a></li>
+				<li sidebar-play-btn><a href><span class="glyphicon glyphicon-pause" ng-attr-play="on"
+						aria-hidden="true"></span></a></li>
+				<li sidebar-filter-btn><a href><span class="glyphicon glyphicon-filter"
+						aria-hidden="true"></span></a></li>
+				<!--li><a href><span class="glyphicon glyphicon-music"
+						aria-hidden="true"></span></a></li-->
+				<li sidebar-alert-btn><a href><span class="glyphicon glyphicon-volume-up" ng-attr-volume="on"
+						aria-hidden="true"></span></a><audio audio-alert id="audio-alert" src="beep.mp3" type="audio/mpeg"></audio></li>	
+			</ul>
+		</div>
+		<!-- div class="search-content" ng-style="$root.pageCntStyle" ng-show="showSearchResult">
+			<div class="search-cnt">
+				<search-detail>
+				</search-detail>
+			</div>
+		</div-->
+		<div ng-controller="dropdownCtrl" class="search-dropdown" style="z-index: 100;" ng-show="showSearchResult">
+			<div style="position: fixed; left: 409px; top: 60px; background-color: white; z-index: 101; width: 486px;"><a style="text-align: center; font-weight: bold; display: block; width: 100%;" href ng-click="hideSearchResult()">Close</a></div>
+			<search-detail>
+			</search-detail>
+		</div>
+		<div ng-view class="page-content" ng-style="$root.pageCntStyle"></div>
+	</div>
+
+	<script src="bower_components/angular/angular.js"></script>
+	<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+	<script src="bower_components/angular-route/angular-route.js"></script>
+	<script src="bower_components/angular-resource/angular-resource.js"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+	<script src="bower_components/mustache.js/mustache.js"></script>
+	<script src="bower_components/spin.js/spin.js"></script>
+	<script src="bower_components/angular-spinner/angular-spinner.js"></script>
+	<script src="bower_components/ui-select/dist/select.js"></script>
+	<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+	<script src="app.js"></script>
+	<script src="snapshot/snapshot.js"></script>
+	<script src="menu/menu.js"></script>
+	<script src="filter/filter.js"></script>
+	<script src="setting/setting.js"></script>
+	<script src="sidebar/sidebar.js"></script>
+</body>
+</html>
